@@ -1,0 +1,12 @@
+## Interface: 100200
+## Title: DungeonBuddy Helper
+## Notes: A helper addon for the DungeonBuddy Bot form the 'No Pressure' Discord server
+## Version: @project-version@
+
+# External code + initialization
+embeds.xml
+
+LFGFrameUtils.lua
+KeystoneParsing.lua
+DungeonBuddyCommand.lua
+Main.lua
