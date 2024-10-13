@@ -116,6 +116,6 @@ end
 ---@param shorthand string The short form name of the dungeon
 ---@param level integer The level of the keystone
 function private:CreateDungeonBuddyCommandAndShowToPlayer(shorthand, level)
-    local command = string.format("/lfgquick %s %dt %s %s", shorthand, level, GetPlayerRole(), GetMissingRoles())
+    local command = string.format("/lfgquick quick_dungeon_string:%s %dt %s %s", shorthand, level, GetPlayerRole(), GetMissingRoles())
     StaticPopupCommand(command, KeyLevelToDiscordChannel(level))
 end
