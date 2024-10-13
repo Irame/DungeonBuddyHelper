@@ -84,7 +84,7 @@ local function StaticPopupCommand(command, discordChannel)
         button2 = ACCEPT,
         hasEditBox = 1,
         hasWideEditBox = 1,
-        editBoxWidth = 180,
+        editBoxWidth = 275,
         preferredIndex = 3,
         OnShow = function(this, ...)
             local editBox = _G[this:GetName() .. "WideEditBox"] or _G[this:GetName() .. "EditBox"]
