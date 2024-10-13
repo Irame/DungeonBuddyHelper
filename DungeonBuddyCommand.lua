@@ -22,7 +22,7 @@ end
 local function GetPlayerRole()
     local role
     if IsInGroup(LE_PARTY_CATEGORY_HOME) then
-        role = UnitGroupRolesAssigned("plyer")
+        role = UnitGroupRolesAssigned("player")
     else
         role = GetSpecializationRole(GetSpecialization())
     end
