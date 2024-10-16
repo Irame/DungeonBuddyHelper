@@ -24,10 +24,10 @@ function addon:ChatCommandHandler(args)
         return
     end
 
-    self:CreateGroupAndShowDiscordCommand(args)
+    self:ShowLFGFrameAndDiscordCommand(args)
 end
 
-function addon:CreateGroupAndShowDiscordCommand(keystoneLink)
+function addon:ShowLFGFrameAndDiscordCommand(keystoneLink)
     local info, level = private:GetKeystoneInfo(keystoneLink)
 
     if not level then
