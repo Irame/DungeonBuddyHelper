@@ -106,7 +106,8 @@ local function LFGListEntryCreation_Select(self, filters, categoryID, groupID, a
 end
 
 local function LFGListEntryCreation_SetEditMode(self, activityID)
-	self.editMode = false;
+	local activeEntryInfo = C_LFGList.GetActiveEntryInfo()
+	self.editMode = activeEntryInfo ~= nil;
 
 	local descInstructions = nil;
 	local isAccountSecured = C_LFGList.IsPlayerAuthenticatedForLFG(self:GetParent().selectedActivity);
@@ -114,13 +115,47 @@ local function LFGListEntryCreation_SetEditMode(self, activityID)
 		descInstructions = LFG_AUTHENTICATOR_DESCRIPTION_BOX;
 	end
 
-    self.GroupDropdown:Enable();
-    self.ActivityDropdown:Enable();
-    self.ListGroupButton:SetText(LIST_GROUP);
-    self.Name:SetEnabled(isAccountSecured);
-    self.Description.EditBox.Instructions:SetText(descInstructions or DESCRIPTION_OF_YOUR_GROUP);
+	if ( self.editMode ) then
+		assert(activeEntryInfo);
 
-    LFGListEntryCreation_Select(self, self.selectedFilters, self.selectedCategory, nil, activityID);
+		--Update the dropdowns
+		LFGListEntryCreation_Select(self, nil, nil, nil, activeEntryInfo.activityID);
+
+		self.GroupDropdown:Disable();
+		self.ActivityDropdown:Disable();
+
+		--Update edit boxes
+		C_LFGList.CopyActiveEntryInfoToCreationFields();
+		self.Name:SetEnabled(activeEntryInfo.questID == nil and isAccountSecured);
+		if ( activeEntryInfo.questID ) then
+			self.Description.EditBox.Instructions:SetText(LFGListUtil_GetQuestDescription(activeEntryInfo.questID));
+		else
+			self.Description.EditBox.Instructions:SetText(descInstructions or DESCRIPTION_OF_YOUR_GROUP);
+		end
+
+		if (self.ItemLevel:IsShown()) then
+			self.ItemLevel.EditBox:SetText(activeEntryInfo.requiredItemLevel ~= 0 and activeEntryInfo.requiredItemLevel or "");
+		else
+			self.PvpItemLevel.EditBox:SetText(activeEntryInfo.requiredItemLevel ~= 0 and activeEntryInfo.requiredItemLevel or "");
+		end
+		self.MythicPlusRating.EditBox:SetText(activeEntryInfo.requiredDungeonScore or "" );
+		self.PVPRating.EditBox:SetText(activeEntryInfo.requiredPvpRating or "" )
+		self.PrivateGroup.CheckButton:SetChecked(activeEntryInfo.privateGroup);
+		self.CrossFactionGroup.CheckButton:SetChecked(not activeEntryInfo.isCrossFactionListing);
+		if(self.PlayStyleDropdown:IsShown()) then
+			LFGListEntryCreation_OnPlayStyleSelected(self, activeEntryInfo.playstyle);
+		end
+
+		self.ListGroupButton:SetText(DONE_EDITING);
+	else
+		self.GroupDropdown:Enable();
+		self.ActivityDropdown:Enable();
+		self.ListGroupButton:SetText(LIST_GROUP);
+		self.Name:SetEnabled(isAccountSecured);
+		self.Description.EditBox.Instructions:SetText(descInstructions or DESCRIPTION_OF_YOUR_GROUP);
+
+		LFGListEntryCreation_Select(self, self.selectedFilters, self.selectedCategory, nil, activityID);
+	end;
 end
 
 local function LFGListEntryCreation_Show(self, baseFilters, selectedCategory, selectedFilters, activityID)
