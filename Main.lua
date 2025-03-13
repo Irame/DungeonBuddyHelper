@@ -19,7 +19,7 @@ function addon:ChatCommandHandler(args)
         return
     end
 
-    if not UnitIsGroupLeader("player", LE_PARTY_CATEGORY_HOME) then
+    if IsInGroup(LE_PARTY_CATEGORY_HOME) and not UnitIsGroupLeader("player", LE_PARTY_CATEGORY_HOME) then
         addon:Print("You are not the party leader.")
         return
     end
