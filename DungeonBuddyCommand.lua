@@ -78,27 +78,38 @@ end
 
 local function NOP() end
 
-local function StaticPopupCommand(command, discordChannel)
+local function GenerateCommand(shorthand, level, completion)
+    return string.format("/lfgquick quick_dungeon_string:%s %d%s %s %s", shorthand, level, completion and "c" or "t", GetPlayerRole(), GetMissingRoles())
+end
+
+---Creates a command used by the DungeonBuddy on the No Pressure Discord
+---and shows a popup to the player where they can copy it
+---@param shorthand string The short form name of the dungeon
+---@param level integer The level of the keystone
+function private:ShowDungeonBuddyCommandToPlayer(shorthand, level)
     StaticPopupDialogs["SHOW_DB_COMMAND"] = StaticPopupDialogs["SHOW_DB_COMMAND"] or {
         text = "Copy the following command and paste it in the '%s' NoP discord channel:",
-        button2 = ACCEPT,
+        button1 = ACCEPT,
         hasEditBox = 1,
-        hasWideEditBox = 1,
         editBoxWidth = 275,
         preferredIndex = 3,
         OnShow = function(this, ...)
-            local editBox = _G[this:GetName() .. "WideEditBox"] or _G[this:GetName() .. "EditBox"]
+            local editBox = _G[this:GetName() .. "EditBox"]
+            local updateCommand = function(completion)
+                editBox:SetText(GenerateCommand(this.data.shorthand, this.data.level, completion))
+                editBox:SetFocus()
+                editBox:HighlightText()
+            end
 
-            editBox:SetText(StaticPopupDialogs["SHOW_DB_COMMAND"].command)
-            editBox:SetFocus()
-            editBox:HighlightText()
+            this.insertedFrame.OnRunTypeChanged = function(id)
+                updateCommand(id == 2)
+            end
 
-            local button = _G[this:GetName() .. "Button2"]
-            button:ClearAllPoints()
-            button:SetWidth(200)
-            button:SetPoint("CENTER", editBox, "CENTER", 0, -30)
+            this.insertedFrame:Reset()
         end,
-        OnHide = NOP,
+        OnHide = function(this, ...)
+            this.insertedFrame.OnRunTypeChanged = nil
+        end,
         OnAccept = NOP,
         OnCancel = NOP,
         EditBoxOnEscapePressed = function(this, ...) this:GetParent():Hide() end,
@@ -107,15 +118,5 @@ local function StaticPopupCommand(command, discordChannel)
         hideOnEscape = 1
     }
 
-    StaticPopupDialogs["SHOW_DB_COMMAND"].command = command
-    StaticPopup_Show("SHOW_DB_COMMAND", discordChannel)
-end
-
----Creates a command used by the DungeonBuddy on the No Pressure Discord
----and shows a popup to the player where they can copy it
----@param shorthand string The short form name of the dungeon
----@param level integer The level of the keystone
-function private:CreateDungeonBuddyCommandAndShowToPlayer(shorthand, level)
-    local command = string.format("/lfgquick quick_dungeon_string:%s %dt %s %s", shorthand, level, GetPlayerRole(), GetMissingRoles())
-    StaticPopupCommand(command, KeyLevelToDiscordChannel(level))
+    StaticPopup_Show("SHOW_DB_COMMAND", KeyLevelToDiscordChannel(level), nil, {shorthand = shorthand, level = level}, _G["DBH_PopupInsertedFrame"])
 end

@@ -39,5 +39,5 @@ function addon:ShowLFGFrameAndDiscordCommand(keystoneLink)
     end
 
     private:ShowLFGFrameWithEntryCreationForActivity(info.activityId)
-    private:CreateDungeonBuddyCommandAndShowToPlayer(info.dungeonShorthand, level)
+    private:ShowDungeonBuddyCommandToPlayer(info.dungeonShorthand, level)
 end

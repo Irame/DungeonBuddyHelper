@@ -6,6 +6,9 @@
 # External code + initialization
 embeds.xml
 
+# Frames
+PopupInsertedFrame.xml
+
 LFGFrameUtils.lua
 KeystoneParsing.lua
 DungeonBuddyCommand.lua

@@ -1,0 +1,30 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Script file="PopupInsertedFrame.lua"/>
+    <CheckButton name="DBH_RunTypeRadioButtonTemplate" inherits="UIRadioButtonTemplate" mixin="DBH_RunTypeRadioButtonMixin" virtual="true">
+		<Scripts>
+			<OnClick method="OnClick"/>
+			<OnLoad method="OnLoad"/>
+		</Scripts>
+	</CheckButton>
+    <Frame name="DBH_PopupInsertedFrame" mixin="DBH_PopupInsertedFrameMixin" hidden="true">
+        <Frames>
+            <CheckButton inherits="DBH_RunTypeRadioButtonTemplate" parentKey="TimeRadioButton" id="1">
+                <Anchors>
+                    <Anchor point="TOPLEFT" y="-5"/>
+                </Anchors>
+                <KeyValues>
+                    <KeyValue key="LabelText" value="Time"/>
+                </KeyValues>
+            </CheckButton>
+            <CheckButton inherits="DBH_RunTypeRadioButtonTemplate" parentKey="CompletionRadioButton" id="2">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.TimeRadioButton" relativePoint="BOTTOMLEFT" x="0" y="1" />
+                </Anchors>
+                <KeyValues>
+                    <KeyValue key="LabelText" value="Completion"/>
+                </KeyValues>
+            </CheckButton>
+        </Frames>
+        <Size x="80" y="30"/>
+    </Frame>
+</Ui>
