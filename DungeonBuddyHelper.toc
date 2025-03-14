@@ -12,4 +12,5 @@ PopupInsertedFrame.xml
 LFGFrameUtils.lua
 KeystoneParsing.lua
 DungeonBuddyCommand.lua
+ChatFilter.lua
 Main.lua
