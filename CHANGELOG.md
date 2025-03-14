@@ -1,2 +1,2 @@
-This is a simple addon that helps setting up groups in the No Pressure discord using the DungeonBuddy bot.
-It can be used with the command "/lfg" and an keystone link can be passed optionally.
+- Added the option to select "Time" or "Completion" in the command copy window.
+- Added a link next to mythic keystone links in chat to open the lfg tool and command window for that key.
