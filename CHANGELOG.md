@@ -1,2 +1,2 @@
-- Added a combo box to select any key of the group.
-- Minor bug fixes.
+- Added HelpTip after clicking OK.
+- Edit Box is now readonly.
