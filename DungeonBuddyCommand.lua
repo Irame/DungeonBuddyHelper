@@ -91,10 +91,9 @@ function private:ShowDungeonBuddyCommandToPlayer(info)
     local popupTextTemplate = "Copy the following command and paste it in the '%s' NoP discord channel:"
     StaticPopupDialogs["SHOW_DB_COMMAND"] = StaticPopupDialogs["SHOW_DB_COMMAND"] or {
         text = popupTextTemplate,
-        button1 = ACCEPT,
+        button1 = OKAY,
         hasEditBox = 1,
         editBoxWidth = 275,
-        preferredIndex = 3,
         OnShow = function(this, ...)
             local editBox = _G[this:GetName() .. "EditBox"]
             local updateCommand = function(keyInfo, completion)
