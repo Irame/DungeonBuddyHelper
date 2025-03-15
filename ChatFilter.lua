@@ -4,7 +4,7 @@ local private = select(2, ...)
 local function PartyChatFilter(self, event, msg, sender, ...)
     local mythicKeyData = msg:match("|Hkeystone:([^|]+)|h")
     if mythicKeyData then
-        local clickableLink = "|HDungeonBuddyHelper:" .. mythicKeyData .. "|h[LFG NOP]|h"
+        local clickableLink = "|HDungeonBuddyHelper:" .. mythicKeyData .. "|h|cfffce303[LFG NoP]|r|h"
         msg = msg .. " " .. clickableLink
     end
     return false, msg, sender, ...
