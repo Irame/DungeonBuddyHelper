@@ -5,6 +5,12 @@ local private = select(2, ...)
 -- in the call stack from LFGListEntryCreation_Show down to C_LFGList.SetEntryTitle()
 -- to be able to remove it and to pass down a custom dungeonId
 
+local function LFGListEntryCreation_OnPlayStyleSelected(self, playstyle)
+	--LFGListEntryCreation_OnPlayStyleSelectedInternal(self, playstyle); -- this contains the call to C_LFGList.SetEntryTitle()
+	self.selectedPlaystyle = playstyle; -- added to mimic the behavior of LFGListEntryCreation_OnPlayStyleSelectedInternal
+	self.PlayStyleDropdown:GenerateMenu();
+end
+
 local function LFGListEntryCreation_Select(self, filters, categoryID, groupID, activityID)
     filters, categoryID, groupID, activityID = LFGListUtil_AugmentWithBest(bit.bor(self.baseFilters or 0, filters or 0), categoryID, groupID, activityID);
 	self.selectedCategory = categoryID;
@@ -158,14 +164,14 @@ local function LFGListEntryCreation_SetEditMode(self, activityID)
 	end;
 end
 
-local function LFGListEntryCreation_Show(self, baseFilters, selectedCategory, selectedFilters, activityID)
-    --If this was what the player selected last time, just leave it filled out with the same info.
+local function LFGListEntryCreation_Show(self, baseFilters, selectedCategory, selectedFilters, activityID, playstyle)
+	--If this was what the player selected last time, just leave it filled out with the same info.
 	--Also don't save it for categories that try to set it to the current area.
 	local categoryInfo = C_LFGList.GetLfgCategoryInfo(selectedCategory);
 	LFGListEntryCreation_SetBaseFilters(self, baseFilters);
 	LFGListEntryCreation_Clear(self);
 	LFGListEntryCreation_Select(self, selectedFilters, selectedCategory);
-	LFGListEntryCreation_OnPlayStyleSelected(self, Enum.LFGEntryPlaystyle.Standard);
+	LFGListEntryCreation_OnPlayStyleSelected(self, playstyle or Enum.LFGEntryPlaystyle.Standard);
 	LFGListEntryCreation_SetEditMode(self, activityID);
 
 	LFGListEntryCreation_UpdateValidState(self);
@@ -177,7 +183,10 @@ local function LFGListEntryCreation_Show(self, baseFilters, selectedCategory, se
 	LFGListEntryCreation_CheckAutoCreate(self);
 end
 
-function private:ShowLFGFrameWithEntryCreationForActivity(activityID)
+---Shows the LFG frame with the entry creation for the activity passed
+---@param activityID number
+---@param completion boolean
+function private:ShowLFGFrameWithEntryCreationForActivity(activityID, completion)
     PVEFrame_ShowFrame("GroupFinderFrame", "LFGListPVEStub");
-    LFGListEntryCreation_Show(LFGListFrame.EntryCreation, Enum.LFGListFilter.PvE, GROUP_FINDER_CATEGORY_ID_DUNGEONS, 0, activityID);
+    LFGListEntryCreation_Show(LFGListFrame.EntryCreation, Enum.LFGListFilter.PvE, GROUP_FINDER_CATEGORY_ID_DUNGEONS, 0, activityID, completion and Enum.LFGEntryPlaystyle.Casual or Enum.LFGEntryPlaystyle.Hardcore);
 end

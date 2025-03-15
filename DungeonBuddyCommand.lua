@@ -78,15 +78,16 @@ end
 
 local function NOP() end
 
-local function GenerateCommand(shorthand, level, completion)
-    return string.format("/lfgquick quick_dungeon_string:%s %d%s %s %s", shorthand, level, completion and "c" or "t", GetPlayerRole(), GetMissingRoles())
+---Generates a command string for the DungeonBuddy on the No Pressure Discord
+---@param info KeystoneInfo The info of the keystone
+local function GenerateCommand(info, completion)
+    return string.format("/lfgquick quick_dungeon_string:%s %d%s %s %s", info.dungeonShorthand, info.level, completion and "c" or "t", GetPlayerRole(), GetMissingRoles())
 end
 
 ---Creates a command used by the DungeonBuddy on the No Pressure Discord
 ---and shows a popup to the player where they can copy it
----@param shorthand string The short form name of the dungeon
----@param level integer The level of the keystone
-function private:ShowDungeonBuddyCommandToPlayer(shorthand, level)
+---@param info KeystoneInfo The info of the keystone
+function private:ShowDungeonBuddyCommandToPlayer(info)
     StaticPopupDialogs["SHOW_DB_COMMAND"] = StaticPopupDialogs["SHOW_DB_COMMAND"] or {
         text = "Copy the following command and paste it in the '%s' NoP discord channel:",
         button1 = ACCEPT,
@@ -95,20 +96,21 @@ function private:ShowDungeonBuddyCommandToPlayer(shorthand, level)
         preferredIndex = 3,
         OnShow = function(this, ...)
             local editBox = _G[this:GetName() .. "EditBox"]
-            local updateCommand = function(completion)
-                editBox:SetText(GenerateCommand(this.data.shorthand, this.data.level, completion))
+            local updateCommand = function(keyInfo, completion)
+                editBox:SetText(GenerateCommand(keyInfo, completion))
                 editBox:SetFocus()
                 editBox:HighlightText()
             end
 
-            this.insertedFrame.OnRunTypeChanged = function(id)
-                updateCommand(id == 2)
+            this.insertedFrame.OnChanged = function(keyInfo, completion)
+                private:ShowLFGFrameWithEntryCreationForActivity(keyInfo.activityId, completion)
+                updateCommand(keyInfo, completion)
             end
 
-            this.insertedFrame:Reset()
+            this.insertedFrame:Initialize(this.data)
         end,
         OnHide = function(this, ...)
-            this.insertedFrame.OnRunTypeChanged = nil
+            this.insertedFrame.OnChanged = nil
         end,
         OnAccept = NOP,
         OnCancel = NOP,
@@ -118,5 +120,5 @@ function private:ShowDungeonBuddyCommandToPlayer(shorthand, level)
         hideOnEscape = 1
     }
 
-    StaticPopup_Show("SHOW_DB_COMMAND", KeyLevelToDiscordChannel(level), nil, {shorthand = shorthand, level = level}, _G["DBH_PopupInsertedFrame"])
+    StaticPopup_Show("SHOW_DB_COMMAND", KeyLevelToDiscordChannel(info.level), nil, info, _G["DBH_PopupInsertedFrame"])
 end

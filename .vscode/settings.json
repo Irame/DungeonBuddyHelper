@@ -29,6 +29,7 @@
         "LFGListEntryCreation_SetEditMode",
         "LFGListEntryCreation_SetBaseFilters",
         "LFGListEntryCreation_OnPlayStyleSelected",
+        "LFGListEntryCreation_OnPlayStyleSelectedInternal",
         "LFGListEntryCreation_UpdateValidState",
         "LFGListEntryCreation_CheckAutoCreate",
         "LFGListEntryCreation_Clear",

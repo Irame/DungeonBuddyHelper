@@ -8,9 +8,15 @@
 	</CheckButton>
     <Frame name="DBH_PopupInsertedFrame" mixin="DBH_PopupInsertedFrameMixin" hidden="true">
         <Frames>
+            <DropdownButton parentKey="KeySelectDropdown" inherits="WowStyle1DropdownTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT" y="-10"/>
+                    <Anchor point="TOPRIGHT" y="-10"/>
+                </Anchors>
+            </DropdownButton>
             <CheckButton inherits="DBH_RunTypeRadioButtonTemplate" parentKey="TimeRadioButton" id="1">
                 <Anchors>
-                    <Anchor point="TOPLEFT" y="-5"/>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.KeySelectDropdown" relativePoint="BOTTOMLEFT" x="30" y="-5"/>
                 </Anchors>
                 <KeyValues>
                     <KeyValue key="LabelText" value="Time"/>
@@ -18,13 +24,18 @@
             </CheckButton>
             <CheckButton inherits="DBH_RunTypeRadioButtonTemplate" parentKey="CompletionRadioButton" id="2">
                 <Anchors>
-                    <Anchor point="TOPLEFT" relativeKey="$parent.TimeRadioButton" relativePoint="BOTTOMLEFT" x="0" y="1" />
+                    <Anchor point="TOPLEFT" relativeKey="$parent.TimeRadioButton" relativePoint="BOTTOMLEFT" x="0" y="-2" />
                 </Anchors>
                 <KeyValues>
                     <KeyValue key="LabelText" value="Completion"/>
                 </KeyValues>
             </CheckButton>
         </Frames>
-        <Size x="80" y="30"/>
+        <Size x="200" y="70"/>
+        <Scripts>
+            <OnLoad method="OnLoad"/>
+            <OnShow method="OnShow"/>
+            <OnHide method="OnHide"/>
+        </Scripts>
     </Frame>
 </Ui>

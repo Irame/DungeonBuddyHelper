@@ -78,6 +78,12 @@ local dungeonInfo = {
     },
 }
 
+---@class KeystoneInfo : DungeonInfo
+---@field level integer the level of the keystone
+
+---@class UnitKeystoneInfo : KeystoneInfo
+---@field unit string
+
 local function ParseKeystoneLink(link)
     local dungeonID, level = string.match(link, "keystone:%d+:(%d+):(%d+)")
     if dungeonID and level then
@@ -102,18 +108,57 @@ end
 ---Gets the Info of the keystone from the link passed.
 ---If no link is passed we try to find a key in the players bags and use it
 ---@param keystoneLink? string The item link string of the key
----@return DungeonInfo? dungeonInfo
----@return integer? keystoneLevel
-function private:GetKeystoneInfo(keystoneLink)
+---@param silent? boolean If true, no messages will be printed to the user
+---@return KeystoneInfo? keyInfo
+function private:GetKeystoneInfoForLink(keystoneLink, silent)
     local dungeonID, level = ParseKeystoneLink(keystoneLink)
     if not dungeonID then
         dungeonID, level = ParseKeystoneLink(GetKeystoneLinkFromBags())
     end
 
     if not dungeonID then
-        self.addon:Print("No Keystone found")
+        if not silent then
+            self.addon:Print("No Keystone found")
+        end
         return
     end
 
-    return dungeonInfo[dungeonID], level
+    local info = dungeonInfo[dungeonID]
+    if not info then
+        if not silent then
+            self.addon:Print("Keystone found but dungeon not supported")
+        end
+        return
+    end
+
+    return {
+        activityId = info.activityId,
+        dungeonShorthand = info.dungeonShorthand,
+        level = level,
+    }
+end
+
+local openRaidLib = LibStub:GetLibrary("LibOpenRaid-1.0")
+
+---Gets the Info for the dungeon from the challenge map id passed
+---@param unit string The unit to get the keystone info for
+---@return UnitKeystoneInfo? keyInfo
+function private:GetKeystoneInfoForUnit(unit)
+    local orlKLeyInfo = openRaidLib.GetKeystoneInfo(unit)
+
+    if not orlKLeyInfo then
+        return
+    end
+
+    local info = dungeonInfo[orlKLeyInfo.challengeMapID]
+    if not info then
+        return
+    end
+
+    return  {
+        activityId = info.activityId,
+        dungeonShorthand = info.dungeonShorthand,
+        level = orlKLeyInfo.level,
+        unit = unit,
+    }
 end

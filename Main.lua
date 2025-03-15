@@ -14,6 +14,10 @@ function addon:OnInitialize()
 end
 
 function addon:ChatCommandHandler(args)
+    self:ShowLFGFrameAndDiscordCommand(args)
+end
+
+function addon:ShowLFGFrameAndDiscordCommand(keystoneLink)
     if IsInRaid(LE_PARTY_CATEGORY_HOME) then
         addon:Print("You are in a raid.")
         return
@@ -24,20 +28,11 @@ function addon:ChatCommandHandler(args)
         return
     end
 
-    self:ShowLFGFrameAndDiscordCommand(args)
-end
+    local info = private:GetKeystoneInfoForLink(keystoneLink)
 
-function addon:ShowLFGFrameAndDiscordCommand(keystoneLink)
-    local info, level = private:GetKeystoneInfo(keystoneLink)
-
-    if not level then
-        addon:Print("No keystone found")
-        return
-    elseif not info then
-        addon:Print("Keystone found but dungeon not supported")
+    if not info then
         return
     end
 
-    private:ShowLFGFrameWithEntryCreationForActivity(info.activityId)
-    private:ShowDungeonBuddyCommandToPlayer(info.dungeonShorthand, level)
+    private:ShowDungeonBuddyCommandToPlayer(info)
 end
