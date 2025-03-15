@@ -88,8 +88,9 @@ end
 ---and shows a popup to the player where they can copy it
 ---@param info KeystoneInfo The info of the keystone
 function private:ShowDungeonBuddyCommandToPlayer(info)
+    local popupTextTemplate = "Copy the following command and paste it in the '%s' NoP discord channel:"
     StaticPopupDialogs["SHOW_DB_COMMAND"] = StaticPopupDialogs["SHOW_DB_COMMAND"] or {
-        text = "Copy the following command and paste it in the '%s' NoP discord channel:",
+        text = popupTextTemplate,
         button1 = ACCEPT,
         hasEditBox = 1,
         editBoxWidth = 275,
@@ -102,9 +103,14 @@ function private:ShowDungeonBuddyCommandToPlayer(info)
                 editBox:HighlightText()
             end
 
+            local updateText = function(keyInfo)
+                this.text:SetFormattedText(popupTextTemplate, KeyLevelToDiscordChannel(keyInfo.level))
+            end
+
             this.insertedFrame.OnChanged = function(keyInfo, completion)
                 private:ShowLFGFrameWithEntryCreationForActivity(keyInfo.activityId, completion)
                 updateCommand(keyInfo, completion)
+                updateText(keyInfo)
             end
 
             this.insertedFrame:Initialize(this.data)
