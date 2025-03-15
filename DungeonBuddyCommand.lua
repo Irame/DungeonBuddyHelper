@@ -107,7 +107,8 @@ function private:ShowDungeonBuddyCommandToPlayer(info)
             end
 
             this.insertedFrame.OnChanged = function(keyInfo, completion)
-                private:ShowLFGFrameWithEntryCreationForActivity(keyInfo.activityId, completion)
+                this.data = keyInfo
+                private:ShowLFGFrameWithEntryCreationForActivity(keyInfo, completion)
                 updateCommand(keyInfo, completion)
                 updateText(keyInfo)
             end
@@ -117,7 +118,17 @@ function private:ShowDungeonBuddyCommandToPlayer(info)
         OnHide = function(this, ...)
             this.insertedFrame.OnChanged = nil
         end,
-        OnAccept = NOP,
+        OnAccept = function(this, ...)
+            if LFGListFrame.EntryCreation.Name:IsVisible() then
+                local helpTipInfo = {
+                    text = ("Enter the name you listed you group as in the NoP discord (e.g. NoP %s XX)"):format(strupper(this.data.dungeonShorthand)),
+                    buttonStyle = HelpTip.ButtonStyle.Close,
+                    targetPoint = HelpTip.Point.RightEdgeCenter,
+                }
+
+                HelpTip:Show(LFGListFrame.EntryCreation.Name, helpTipInfo, LFGListFrame.EntryCreation.Name)
+            end
+        end,
         OnCancel = NOP,
         EditBoxOnEscapePressed = function(this, ...) this:GetParent():Hide() end,
         timeout = 0,

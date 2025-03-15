@@ -184,9 +184,9 @@ local function LFGListEntryCreation_Show(self, baseFilters, selectedCategory, se
 end
 
 ---Shows the LFG frame with the entry creation for the activity passed
----@param activityID number
+---@param keyInfo KeystoneInfo
 ---@param completion boolean
-function private:ShowLFGFrameWithEntryCreationForActivity(activityID, completion)
+function private:ShowLFGFrameWithEntryCreationForActivity(keyInfo, completion)
     PVEFrame_ShowFrame("GroupFinderFrame", "LFGListPVEStub");
-    LFGListEntryCreation_Show(LFGListFrame.EntryCreation, Enum.LFGListFilter.PvE, GROUP_FINDER_CATEGORY_ID_DUNGEONS, 0, activityID, completion and Enum.LFGEntryPlaystyle.Casual or Enum.LFGEntryPlaystyle.Hardcore);
+    LFGListEntryCreation_Show(LFGListFrame.EntryCreation, Enum.LFGListFilter.PvE, GROUP_FINDER_CATEGORY_ID_DUNGEONS, 0, keyInfo.activityId, completion and Enum.LFGEntryPlaystyle.Casual or Enum.LFGEntryPlaystyle.Hardcore);
 end
