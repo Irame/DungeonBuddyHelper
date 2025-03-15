@@ -23,9 +23,16 @@ function addon:ShowLFGFrameAndDiscordCommand(keystoneLink)
         return
     end
 
-    if IsInGroup(LE_PARTY_CATEGORY_HOME) and not UnitIsGroupLeader("player", LE_PARTY_CATEGORY_HOME) then
-        addon:Print("You are not the party leader.")
-        return
+    if IsInGroup(LE_PARTY_CATEGORY_HOME) then
+        if not UnitIsGroupLeader("player", LE_PARTY_CATEGORY_HOME) then
+            addon:Print("You are not the party leader.")
+            return
+        end
+
+        if GetNumGroupMembers(LE_PARTY_CATEGORY_HOME) == 5 then
+            addon:Print("Your party is full.")
+            return
+        end
     end
 
     local info = private:GetKeystoneInfoForLink(keystoneLink)
