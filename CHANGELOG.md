@@ -1,2 +1,2 @@
-- Added the option to select "Time" or "Completion" in the command copy window.
-- Added a link next to mythic keystone links in chat to open the lfg tool and command window for that key.
+- Added a combo box to select any key of the group.
+- Minor bug fixes.
