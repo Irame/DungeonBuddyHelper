@@ -96,10 +96,14 @@ function private:ShowDungeonBuddyCommandToPlayer(info)
         editBoxWidth = 275,
         OnShow = function(this, ...)
             local editBox = _G[this:GetName() .. "EditBox"]
+            editBox:SetScript("OnMouseUp", function(self) self:HighlightText(); end);
+
             local updateCommand = function(keyInfo, completion)
-                editBox:SetText(GenerateCommand(keyInfo, completion))
+                local command = GenerateCommand(keyInfo, completion)
+                editBox:SetText(command)
                 editBox:SetFocus()
                 editBox:HighlightText()
+                editBox:SetScript("OnChar", function(self) self:SetText(command); self:HighlightText(); end);
             end
 
             local updateText = function(keyInfo)
