@@ -42,7 +42,7 @@ local function GetMissingRoles()
     local groupSize = GetNumGroupMembers()
 
     -- Loop through all group members
-    for i = 0, groupSize do
+    for i = 0, groupSize-1 do
         local role
         if i == 0 then
             role = GetPlayerRole()
