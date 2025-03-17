@@ -123,7 +123,7 @@ function private:ShowDungeonBuddyCommandToPlayer(info)
             this.insertedFrame.OnChanged = nil
         end,
         OnAccept = function(this, ...)
-            if LFGListFrame.EntryCreation.Name:IsVisible() then
+            if LFGListFrame.EntryCreation.Name:IsVisible() and this.data then
                 local helpTipInfo = {
                     text = ("Enter the name you listed you group as in the NoP discord (e.g. NoP %s XX)"):format(strupper(this.data.dungeonShorthand)),
                     buttonStyle = HelpTip.ButtonStyle.Close,

@@ -22,21 +22,10 @@ end
 ---@field OnChanged fun(keyInfo: UnitKeystoneInfo|KeystoneInfo, completion: boolean)
 DBH_PopupInsertedFrameMixin = {}
 
-function PartyMembers()
-    local i = -1
-    return function()
-        i = i + 1
-
-        if i == 0 then
-            return "player"
-        end
-
-        if i >= GetNumGroupMembers(LE_PARTY_CATEGORY_HOME) then
-            return
-        end
-
-        return "party" .. i
-    end
+local function AreKeystoneInfosEqual(info1, info2)
+    return info1.activityId == info2.activityId
+    and info1.level == info2.level
+    and (not info1.unit or not info2.unit or info1.unit == info2.unit)
 end
 
 ---Update the key dropdown
@@ -45,23 +34,28 @@ function DBH_PopupInsertedFrameMixin:UpdateKeyDropdown(keyInfoToSelect)
     self.selectedKeyInfo = nil
 
     ---@type KeystoneInfo[]|UnitKeystoneInfo[]
-    local partyKeyData = {self.initInfo}
-    for unit in PartyMembers() do
-        local keyInfo = private:GetKeystoneInfoForUnit(unit)
-
-        if keyInfo then
-            if keyInfoToSelect
-                and keyInfo.activityId == keyInfoToSelect.activityId
-                and keyInfo.level == keyInfoToSelect.level
-                and (not keyInfoToSelect.unit or keyInfoToSelect.unit == keyInfo.unit)
-                and not self.selectedKeyInfo
-            then
-                tremove(partyKeyData, 1)
-                self.selectedKeyInfo = keyInfo
-            end
-
-            tinsert(partyKeyData, keyInfo)
+    local partyKeyData = { self.initInfo }
+    local initInfoRemoved = false
+    for keyInfo in private:IterPartyKeys() do
+        -- Select the key if it is the same as the one we want to select
+        if keyInfoToSelect
+            and AreKeystoneInfosEqual(keyInfo, keyInfoToSelect)
+            and not self.selectedKeyInfo
+        then
+            self.selectedKeyInfo = keyInfo
         end
+
+        -- Remove the initInfo from the dropdown
+        -- if we would add the same key again
+        if self.initInfo
+            and AreKeystoneInfosEqual(keyInfo, self.initInfo)
+            and not initInfoRemoved
+        then
+            tremove(partyKeyData, 1)
+            initInfoRemoved = true
+        end
+
+        tinsert(partyKeyData, keyInfo)
     end
 
     if not self.selectedKeyInfo then

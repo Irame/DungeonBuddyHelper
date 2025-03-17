@@ -39,11 +39,22 @@ function addon:ShowLFGFrameAndDiscordCommand(keystoneLink)
         end
     end
 
-    local info = private:GetKeystoneInfoForLink(keystoneLink)
+    local info
+    if keystoneLink and keystoneLink:trim() ~= "" then
+        info = private:GetKeystoneInfoForLink(keystoneLink)
+        if not info then
+            addon:Print("Invalid Keystone link.")
+            return
+        end
+    end
 
     if not info then
-        self:Print("No Keystone found")
-        return
+        -- Get the first keystone in the party
+        info = private:IterPartyKeys()()
+        if not info then
+            self:Print("No Keystone found in the party.")
+            return
+        end
     end
 
     private:ShowDungeonBuddyCommandToPlayer(info)

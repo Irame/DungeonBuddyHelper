@@ -95,29 +95,12 @@ local function ParseKeystoneLink(link)
     end
 end
 
--- Function to search the bags and retrieve keystone information
-local function GetKeystoneLinkFromBags()
-    local keystoneID = 180653  -- This is the item ID for Mythic Keystone
-    for bag = 0, 4 do  -- Loop through the bag slots (0-4 are the normal bags)
-        for slot = 1, C_Container.GetContainerNumSlots(bag) do
-            local itemID = C_Container.GetContainerItemID(bag, slot)
-            if itemID == keystoneID then
-                -- Found the keystone! Get the item link
-                return C_Container.GetContainerItemLink(bag, slot)
-            end
-        end
-    end
-end
-
 ---Gets the Info of the keystone from the link passed.
 ---If no link is passed we try to find a key in the players bags and use it
 ---@param keystoneLink? string The item link string of the key
 ---@return KeystoneInfo? keyInfo
 function private:GetKeystoneInfoForLink(keystoneLink)
     local dungeonID, level = ParseKeystoneLink(keystoneLink)
-    if not dungeonID then
-        dungeonID, level = ParseKeystoneLink(GetKeystoneLinkFromBags())
-    end
 
     if not dungeonID then
         return
@@ -144,7 +127,7 @@ local openRaidLib = LibStub:GetLibrary("LibOpenRaid-1.0")
 function private:GetKeystoneInfoForUnit(unit)
     local orlKLeyInfo = openRaidLib.GetKeystoneInfo(unit)
 
-    if not orlKLeyInfo then
+    if not orlKLeyInfo or orlKLeyInfo.challengeMapID == 0 then
         return
     end
 

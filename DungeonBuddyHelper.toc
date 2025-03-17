@@ -10,6 +10,7 @@ embeds.xml
 PopupInsertedFrame.xml
 LFGFrameButton.xml
 
+Utils.lua
 LFGFrameUtils.lua
 KeystoneParsing.lua
 DungeonBuddyCommand.lua
