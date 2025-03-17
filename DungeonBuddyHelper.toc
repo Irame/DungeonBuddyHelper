@@ -8,6 +8,7 @@ embeds.xml
 
 # Frames
 PopupInsertedFrame.xml
+LFGFrameButton.xml
 
 LFGFrameUtils.lua
 KeystoneParsing.lua

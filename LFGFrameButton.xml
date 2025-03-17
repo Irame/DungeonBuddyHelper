@@ -1,0 +1,13 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Script file="LFGFrameButton.lua"/>
+    <Button name="DBH_LFGFrameButtonTemplate" inherits="LFGListMagicButtonTemplate" mixin="DBH_LFGFrameButtonMixin" text="NoP LFG" virtual="true">
+        <Size y="22"/>
+        <Anchors>
+            <Anchor point="LEFT" relativePoint="RIGHT" x="10" relativeKey="$parent.Label"/>
+            <Anchor point="RIGHT" x="-10"/>
+        </Anchors>
+        <Scripts>
+            <OnClick method="OnClick"/>
+        </Scripts>
+    </Button>
+</Ui>

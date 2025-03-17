@@ -11,12 +11,16 @@ private.addon = addon
 function addon:OnInitialize()
     self:RegisterChatCommand("dbh", "ChatCommandHandler");
     self:RegisterChatCommand("lfg", "ChatCommandHandler");
+
+    CreateFrame("Button", "DBH_LFGFrameButton", LFGListFrame.CategorySelection, "DBH_LFGFrameButtonTemplate")
 end
 
 function addon:ChatCommandHandler(args)
     self:ShowLFGFrameAndDiscordCommand(args)
 end
 
+---Shows the Dungeon Buddy command to the player and opens the LFG frame.
+---@param keystoneLink? string
 function addon:ShowLFGFrameAndDiscordCommand(keystoneLink)
     if IsInRaid(LE_PARTY_CATEGORY_HOME) then
         addon:Print("You are in a raid.")

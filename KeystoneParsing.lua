@@ -85,6 +85,10 @@ local dungeonInfo = {
 ---@field unit string
 
 local function ParseKeystoneLink(link)
+    if not link then
+        return
+    end
+
     local dungeonID, level = string.match(link, "keystone:%d+:(%d+):(%d+)")
     if dungeonID and level then
         return tonumber(dungeonID), tonumber(level)
