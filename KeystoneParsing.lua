@@ -112,26 +112,20 @@ end
 ---Gets the Info of the keystone from the link passed.
 ---If no link is passed we try to find a key in the players bags and use it
 ---@param keystoneLink? string The item link string of the key
----@param silent? boolean If true, no messages will be printed to the user
 ---@return KeystoneInfo? keyInfo
-function private:GetKeystoneInfoForLink(keystoneLink, silent)
+function private:GetKeystoneInfoForLink(keystoneLink)
     local dungeonID, level = ParseKeystoneLink(keystoneLink)
     if not dungeonID then
         dungeonID, level = ParseKeystoneLink(GetKeystoneLinkFromBags())
     end
 
     if not dungeonID then
-        if not silent then
-            self.addon:Print("No Keystone found")
-        end
         return
     end
 
     local info = dungeonInfo[dungeonID]
     if not info then
-        if not silent then
-            self.addon:Print("Keystone found but dungeon not supported")
-        end
+        self.addon:Printf("Missing support for dungeon with map id '%d'. Please open a issue on CurseForge or GitHub.", dungeonID)
         return
     end
 
@@ -156,6 +150,7 @@ function private:GetKeystoneInfoForUnit(unit)
 
     local info = dungeonInfo[orlKLeyInfo.challengeMapID]
     if not info then
+        self.addon:Printf("Missing support for dungeon with map id '%d'. Please open a issue on CurseForge or GitHub.", orlKLeyInfo.challengeMapID)
         return
     end
 

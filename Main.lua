@@ -42,6 +42,7 @@ function addon:ShowLFGFrameAndDiscordCommand(keystoneLink)
     local info = private:GetKeystoneInfoForLink(keystoneLink)
 
     if not info then
+        self:Print("No Keystone found")
         return
     end
 
