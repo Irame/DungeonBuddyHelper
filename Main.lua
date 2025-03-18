@@ -15,6 +15,16 @@ function addon:OnInitialize()
     self:RegisterChatCommand("lfg", "ChatCommandHandler");
 
     CreateFrame("Button", "DBH_LFGFrameButton", LFGListFrame.CategorySelection, "DBH_LFGFrameButtonTemplate")
+
+    self.WaitingForKeyUpdate = false
+    self.OnKeystoneUpdate = function(unitName, keystoneInfo, allKeystonesInfo)
+        if self.WaitingForKeyUpdate and private:IterPartyKeys()() then
+            self.WaitingForKeyUpdate = false
+            self:Print("Keystone info recieved from at least one party member. Try '/lfg' again!")
+        end
+    end
+
+    private.openRaidLib.RegisterCallback(self, "KeystoneUpdate", "OnKeystoneUpdate")
 end
 
 function addon:ChatCommandHandler(args)
@@ -54,7 +64,21 @@ function addon:ShowLFGFrameAndDiscordCommand(keystoneLink)
         -- Get the first keystone in the party
         info = private:IterPartyKeys()()
         if not info then
-            self:Print("No Keystone found in the party.")
+            if IsInGroup(LE_PARTY_CATEGORY_HOME) then
+                self:Print("No Keystone found in the party. Waiting for keystone info from party members...")
+                if not self.WaitingForKeyUpdate then
+                    self.WaitingForKeyUpdate = true
+                    private.openRaidLib:RequestKeystoneDataFromParty()
+                    C_Timer.After(5, function()
+                        if self.WaitingForKeyUpdate then
+                            self.WaitingForKeyUpdate = false
+                            self:Print("No keystone info recieved from party members in the last 5 seconds.")
+                        end
+                    end)
+                end
+            else
+                self:Print("No Keystone found in your inventory.")
+            end
             return
         end
     end
