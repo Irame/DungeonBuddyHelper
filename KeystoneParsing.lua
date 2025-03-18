@@ -119,13 +119,11 @@ function private:GetKeystoneInfoForLink(keystoneLink)
     }
 end
 
-local openRaidLib = LibStub:GetLibrary("LibOpenRaid-1.0")
-
 ---Gets the Info for the dungeon from the challenge map id passed
 ---@param unit string The unit to get the keystone info for
 ---@return UnitKeystoneInfo? keyInfo
 function private:GetKeystoneInfoForUnit(unit)
-    local orlKLeyInfo = openRaidLib.GetKeystoneInfo(unit)
+    local orlKLeyInfo = private.openRaidLib.GetKeystoneInfo(unit)
 
     if not orlKLeyInfo or orlKLeyInfo.challengeMapID == 0 then
         return

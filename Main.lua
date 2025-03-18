@@ -8,6 +8,8 @@ local private = select(2, ...)
 local addon = LibStub("AceAddon-3.0"):NewAddon(addonName, "AceConsole-3.0")
 private.addon = addon
 
+private.openRaidLib = LibStub:GetLibrary("LibOpenRaid-1.0")
+
 function addon:OnInitialize()
     self:RegisterChatCommand("dbh", "ChatCommandHandler");
     self:RegisterChatCommand("lfg", "ChatCommandHandler");

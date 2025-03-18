@@ -118,8 +118,6 @@ function DBH_PopupInsertedFrameMixin:ResetRadioButtons()
     self.CompletionRadioButton:SetChecked(false)
 end
 
-local openRaidLib = LibStub:GetLibrary("LibOpenRaid-1.0")
-
 function DBH_PopupInsertedFrameMixin:OnLoad()
     self.OnKeystoneUpdate = function(unitId, keystoneInfo, allKeystonesInfo)
         if self:IsShown() then
@@ -129,10 +127,10 @@ function DBH_PopupInsertedFrameMixin:OnLoad()
 end
 
 function DBH_PopupInsertedFrameMixin:OnShow()
-    openRaidLib.RegisterCallback(self, "KeystoneUpdate", "OnKeystoneUpdate")
-    openRaidLib:RequestKeystoneDataFromParty()
+    private.openRaidLib.RegisterCallback(self, "KeystoneUpdate", "OnKeystoneUpdate")
+    private.openRaidLib:RequestKeystoneDataFromParty()
 end
 
 function DBH_PopupInsertedFrameMixin:OnHide()
-    openRaidLib.UnregisterCallback(self, "KeystoneUpdate", "OnKeystoneUpdate")
+    private.openRaidLib.UnregisterCallback(self, "KeystoneUpdate", "OnKeystoneUpdate")
 end
