@@ -27,6 +27,10 @@ function addon:OnInitialize()
     private.openRaidLib.RegisterCallback(self, "KeystoneUpdate", "OnKeystoneUpdate")
 end
 
+function DBH_OnAddonCompartmentClick()
+    addon:ShowLFGFrameAndDiscordCommand()
+end
+
 function addon:ChatCommandHandler(args)
     self:ShowLFGFrameAndDiscordCommand(args)
 end
