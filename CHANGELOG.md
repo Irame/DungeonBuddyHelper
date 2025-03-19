@@ -1,2 +1,3 @@
-- Added HelpTip after clicking OK.
-- Edit Box is now readonly.
+- Added button to Blizzard LFG frame.
+- Dialog can now be opened when at least one party member has a key.
+- Added addon compartment button.
