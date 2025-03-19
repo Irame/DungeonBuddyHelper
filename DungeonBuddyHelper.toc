@@ -7,8 +7,8 @@
 embeds.xml
 
 # Frames
-PopupInsertedFrame.xml
-LFGFrameButton.xml
+Frames/PopupInsertedFrame.xml
+Frames/LFGFrameButton.xml
 
 Utils.lua
 LFGFrameUtils.lua
