@@ -3,11 +3,11 @@ local private = select(2, ...)
 
 ---@class DBH_RunTypeRadioButton : CheckButton
 ---@field LabelText string
+---@field text FontString
 DBH_RunTypeRadioButtonMixin = {}
 
 function DBH_RunTypeRadioButtonMixin:OnClick()
-    ---@type DBH_PopupInsertedFrame
-    local parent = self:GetParent();
+    local parent = self:GetParent() --[[@as DBH_PopupInsertedFrame]];
     parent:RunTypeRadioButtonClicked(self:GetID());
 end
 

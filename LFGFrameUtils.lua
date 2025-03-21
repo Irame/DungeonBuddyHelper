@@ -125,7 +125,7 @@ local function LFGListEntryCreation_SetEditMode(self, activityID)
 		assert(activeEntryInfo);
 
 		--Update the dropdowns
-		LFGListEntryCreation_Select(self, nil, nil, nil, activeEntryInfo.activityID);
+		LFGListEntryCreation_Select(self, nil, nil, nil, activeEntryInfo.activityIDs[1]);
 
 		self.GroupDropdown:Disable();
 		self.ActivityDropdown:Disable();
