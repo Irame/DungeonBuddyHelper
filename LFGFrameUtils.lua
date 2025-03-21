@@ -116,7 +116,7 @@ local function LFGListEntryCreation_SetEditMode(self, activityID)
 	self.editMode = activeEntryInfo ~= nil;
 
 	local descInstructions = nil;
-	local isAccountSecured = C_LFGList.IsPlayerAuthenticatedForLFG(self:GetParent().selectedActivity);
+	local isAccountSecured = C_LFGList.IsPlayerAuthenticatedForLFG(self:GetParent().selectedCategory);
 	if (not isAccountSecured) then
 		descInstructions = LFG_AUTHENTICATOR_DESCRIPTION_BOX;
 	end
