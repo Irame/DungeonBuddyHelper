@@ -38,16 +38,13 @@ local function GetMissingRoles()
 
     local missingRoles = {"t", "h", "d", "d", "d"}
 
-    -- Get the size of the group
-    local groupSize = GetNumGroupMembers()
-
     -- Loop through all group members
-    for i = 0, groupSize-1 do
+    for unit in private:IterPartyMembers() do
         local role
-        if i == 0 then
+        if unit == "player" then
             role = GetPlayerRole()
         else
-            role = GetShortRole(UnitGroupRolesAssigned("party"..i))
+            role = GetShortRole(UnitGroupRolesAssigned(unit))
         end
 
         for j, r in ipairs(missingRoles) do
