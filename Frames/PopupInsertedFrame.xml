@@ -1,6 +1,6 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Script file="PopupInsertedFrame.lua"/>
-    <CheckButton name="DBH_RunTypeRadioButtonTemplate" inherits="UIRadioButtonTemplate" mixin="DBH_RunTypeRadioButtonMixin" virtual="true">
+    <CheckButton name="DBH_RunTypeRadioButtonTemplate" inherits="UIRadialButtonTemplate" mixin="DBH_RunTypeRadioButtonMixin" virtual="true">
 		<Scripts>
 			<OnClick method="OnClick"/>
 			<OnLoad method="OnLoad"/>
@@ -31,7 +31,7 @@
                 </KeyValues>
             </CheckButton>
         </Frames>
-        <Size x="200" y="70"/>
+        <Size x="200" y="73"/>
         <Scripts>
             <OnLoad method="OnLoad"/>
             <OnShow method="OnShow"/>
