@@ -92,15 +92,15 @@ function private:ShowDungeonBuddyCommandToPlayer(info)
         hasEditBox = 1,
         editBoxWidth = 275,
         OnShow = function(this, ...)
-            local editBox = _G[this:GetName() .. "EditBox"]
-            editBox:SetScript("OnMouseUp", function(self) self:HighlightText(); end);
+            local editBox = _G[this:GetName() .. "EditBox"] --[[@as EditBox]]
+            editBox:SetScript("OnMouseUp", function(eb) eb:HighlightText(); end);
 
             local updateCommand = function(keyInfo, completion)
                 local command = GenerateCommand(keyInfo, completion)
                 editBox:SetText(command)
                 editBox:SetFocus()
                 editBox:HighlightText()
-                editBox:SetScript("OnChar", function(self) self:SetText(command); self:HighlightText(); end);
+                editBox:SetScript("OnChar", function(eb) eb:SetText(command); eb:HighlightText(); end);
             end
 
             local updateText = function(keyInfo)
@@ -114,10 +114,20 @@ function private:ShowDungeonBuddyCommandToPlayer(info)
                 updateText(keyInfo)
             end
 
+            this.eventFrame = CreateFrame("Frame", nil, this)
+            this.eventFrame:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
+            this.eventFrame:RegisterEvent("PLAYER_ROLES_ASSIGNED")
+            this.eventFrame:RegisterEvent("GROUP_ROSTER_UPDATE")
+            this.eventFrame:SetScript("OnEvent", function()
+                updateCommand(this.data, this.insertedFrame:IsCompletionChecked())
+            end)
+
             this.insertedFrame:Initialize(this.data)
         end,
         OnHide = function(this, ...)
             this.insertedFrame.OnChanged = nil
+            this.eventFrame:UnregisterAllEvents()
+            this.eventFrame = nil
         end,
         OnAccept = function(this, ...)
             if LFGListFrame.EntryCreation.Name:IsVisible() and this.data then

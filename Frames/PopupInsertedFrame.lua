@@ -96,9 +96,13 @@ function DBH_PopupInsertedFrameMixin:RunTypeRadioButtonClicked(id)
     self:InvokeOnChanged()
 end
 
+function DBH_PopupInsertedFrameMixin:IsCompletionChecked()
+    return self.CompletionRadioButton:GetChecked()
+end
+
 function DBH_PopupInsertedFrameMixin:InvokeOnChanged()
     if self.OnChanged then
-        self.OnChanged(self.selectedKeyInfo, self.CompletionRadioButton:GetChecked())
+        self.OnChanged(self.selectedKeyInfo, self:IsCompletionChecked())
     end
 end
 
