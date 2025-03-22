@@ -9,9 +9,9 @@
     <Frame name="DBH_PopupInsertedFrame" mixin="DBH_PopupInsertedFrameMixin" hidden="true">
         <Frames>
             <DropdownButton parentKey="KeySelectDropdown" inherits="WowStyle1DropdownTemplate">
+                <Size x="200" y="25"></Size>
                 <Anchors>
-                    <Anchor point="TOPLEFT" y="-10"/>
-                    <Anchor point="TOPRIGHT" y="-10"/>
+                    <Anchor point="TOP" y="-10"/>
                 </Anchors>
             </DropdownButton>
             <CheckButton inherits="DBH_RunTypeRadioButtonTemplate" parentKey="TimeRadioButton" id="1">
@@ -30,12 +30,25 @@
                     <KeyValue key="LabelText" value="Completion"/>
                 </KeyValues>
             </CheckButton>
+            <EditBox inherits="InputBoxTemplate" parentKey="InputBox" mixin="DBH_CommandInputBoxMixin">
+                <Size y="20"/>
+                <Anchors>
+                    <Anchor point="BOTTOMLEFT" x="5"/>
+                    <Anchor point="BOTTOMRIGHT"/>
+                </Anchors>
+                <Scripts>
+                    <OnEscapePressed method="OnEscapePressed"/>
+                    <OnMouseUp method="OnMouseUp"/>
+                    <OnChar method="OnChar"/>
+                </Scripts>
+            </EditBox>
         </Frames>
-        <Size x="200" y="73"/>
+        <Size x="275" y="105"/>
         <Scripts>
             <OnLoad method="OnLoad"/>
             <OnShow method="OnShow"/>
             <OnHide method="OnHide"/>
+            <OnEvent method="OnEvent"/>
         </Scripts>
     </Frame>
 </Ui>

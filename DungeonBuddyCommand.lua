@@ -77,7 +77,7 @@ local function NOP() end
 
 ---Generates a command string for the DungeonBuddy on the No Pressure Discord
 ---@param info KeystoneInfo The info of the keystone
-local function GenerateCommand(info, completion)
+function private:GenerateCommand(info, completion)
     return string.format("/lfgquick quick_dungeon_string:%s %d%s %s %s", info.dungeonShorthand, info.level, completion and "c" or "t", GetPlayerRole(), GetMissingRoles())
 end
 
@@ -89,20 +89,7 @@ function private:ShowDungeonBuddyCommandToPlayer(info)
     StaticPopupDialogs["SHOW_DB_COMMAND"] = StaticPopupDialogs["SHOW_DB_COMMAND"] or {
         text = popupTextTemplate,
         button1 = OKAY,
-        hasEditBox = 1,
-        editBoxWidth = 275,
         OnShow = function(this, ...)
-            local editBox = _G[this:GetName() .. "EditBox"] --[[@as EditBox]]
-            editBox:SetScript("OnMouseUp", function(eb) eb:HighlightText(); end);
-
-            local updateCommand = function(keyInfo, completion)
-                local command = GenerateCommand(keyInfo, completion)
-                editBox:SetText(command)
-                editBox:SetFocus()
-                editBox:HighlightText()
-                editBox:SetScript("OnChar", function(eb) eb:SetText(command); eb:HighlightText(); end);
-            end
-
             local updateText = function(keyInfo)
                 this.text:SetFormattedText(popupTextTemplate, KeyLevelToDiscordChannel(keyInfo.level))
             end
@@ -110,24 +97,13 @@ function private:ShowDungeonBuddyCommandToPlayer(info)
             this.insertedFrame.OnChanged = function(keyInfo, completion)
                 this.data = keyInfo
                 private:ShowLFGFrameWithEntryCreationForActivity(keyInfo, completion)
-                updateCommand(keyInfo, completion)
                 updateText(keyInfo)
             end
-
-            this.eventFrame = CreateFrame("Frame", nil, this)
-            this.eventFrame:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
-            this.eventFrame:RegisterEvent("PLAYER_ROLES_ASSIGNED")
-            this.eventFrame:RegisterEvent("GROUP_ROSTER_UPDATE")
-            this.eventFrame:SetScript("OnEvent", function()
-                updateCommand(this.data, this.insertedFrame:IsCompletionChecked())
-            end)
 
             this.insertedFrame:Initialize(this.data)
         end,
         OnHide = function(this, ...)
             this.insertedFrame.OnChanged = nil
-            this.eventFrame:UnregisterAllEvents()
-            this.eventFrame = nil
         end,
         OnAccept = function(this, ...)
             if LFGListFrame.EntryCreation.Name:IsVisible() and this.data then
@@ -141,7 +117,6 @@ function private:ShowDungeonBuddyCommandToPlayer(info)
             end
         end,
         OnCancel = NOP,
-        EditBoxOnEscapePressed = function(this, ...) this:GetParent():Hide() end,
         timeout = 0,
         whileDead = 1,
         hideOnEscape = 1

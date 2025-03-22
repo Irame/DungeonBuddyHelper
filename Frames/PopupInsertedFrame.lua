@@ -15,10 +15,35 @@ function DBH_RunTypeRadioButtonMixin:OnLoad()
     self.text:SetText(self.LabelText);
 end
 
+---@class DBH_CommandInputBox : EditBox
+DBH_CommandInputBoxMixin = {}
+
+function DBH_CommandInputBoxMixin:OnEscapePressed()
+    -- hide the static popup
+    self:GetParent():GetParent():Hide();
+end
+
+function DBH_CommandInputBoxMixin:OnMouseUp()
+    self:HighlightText();
+end
+
+function DBH_CommandInputBoxMixin:OnChar()
+    self:SetText(self.command);
+    self:HighlightText();
+end
+
+function DBH_CommandInputBoxMixin:SetCommand(command)
+    self.command = command;
+    self:SetText(command);
+    self:SetFocus();
+    self:HighlightText();
+end
+
 ---@class DBH_PopupInsertedFrame : Frame
 ---@field TimeRadioButton DBH_RunTypeRadioButton
 ---@field CompletionRadioButton DBH_RunTypeRadioButton
 ---@field KeySelectDropdown any
+---@field InputBox DBH_CommandInputBox
 ---@field OnChanged fun(keyInfo: UnitKeystoneInfo|KeystoneInfo, completion: boolean)
 DBH_PopupInsertedFrameMixin = {}
 
@@ -101,9 +126,22 @@ function DBH_PopupInsertedFrameMixin:IsCompletionChecked()
 end
 
 function DBH_PopupInsertedFrameMixin:InvokeOnChanged()
+    local keyInfo = self.selectedKeyInfo
+    local completion = self:IsCompletionChecked()
+
     if self.OnChanged then
-        self.OnChanged(self.selectedKeyInfo, self:IsCompletionChecked())
+        self.OnChanged(keyInfo, completion)
     end
+
+    self:UpdateCommand(keyInfo, completion)
+end
+
+---Update the command
+---@param keyInfo KeystoneInfo
+---@param completion boolean
+function DBH_PopupInsertedFrameMixin:UpdateCommand(keyInfo, completion)
+    local command = private:GenerateCommand(keyInfo, completion)
+    self.InputBox:SetCommand(command)
 end
 
 ---Initialize the popup inserted frame
@@ -133,8 +171,18 @@ end
 function DBH_PopupInsertedFrameMixin:OnShow()
     private.openRaidLib.RegisterCallback(self, "KeystoneUpdate", "OnKeystoneUpdate")
     private.openRaidLib:RequestKeystoneDataFromParty()
+
+    self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
+    self:RegisterEvent("PLAYER_ROLES_ASSIGNED")
+    self:RegisterEvent("GROUP_ROSTER_UPDATE")
 end
 
 function DBH_PopupInsertedFrameMixin:OnHide()
     private.openRaidLib.UnregisterCallback(self, "KeystoneUpdate", "OnKeystoneUpdate")
+
+    self:UnregisterAllEvents();
+end
+
+function DBH_PopupInsertedFrameMixin:OnEvent()
+    self:UpdateCommand(self.selectedKeyInfo, self:IsCompletionChecked())
 end
