@@ -187,6 +187,7 @@ end
 ---@param keyInfo KeystoneInfo
 ---@param completion boolean
 function private:ShowLFGFrameWithEntryCreationForActivity(keyInfo, completion)
+    HelpTip:Hide(LFGListFrame.EntryCreation.Name)
     PVEFrame_ShowFrame("GroupFinderFrame", "LFGListPVEStub");
     LFGListEntryCreation_Show(LFGListFrame.EntryCreation, Enum.LFGListFilter.PvE, GROUP_FINDER_CATEGORY_ID_DUNGEONS, 0, keyInfo.activityId, completion and Enum.LFGEntryPlaystyle.Casual or Enum.LFGEntryPlaystyle.Hardcore);
 end
