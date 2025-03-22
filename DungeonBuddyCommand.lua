@@ -88,7 +88,7 @@ end
 ---and shows a popup to the player where they can copy it
 ---@param info KeystoneInfo The info of the keystone
 function private:ShowDungeonBuddyCommandToPlayer(info)
-    local popupTextTemplate = "Copy the following command and paste it in the '%s' NoP discord channel:"
+    local popupTextTemplate = "Select key and playstyle and copy'n'paste the command in the '%s' NoP discord channel."
     StaticPopupDialogs["SHOW_DB_COMMAND"] = StaticPopupDialogs["SHOW_DB_COMMAND"] or {
         text = popupTextTemplate,
         button1 = OKAY,
