@@ -87,11 +87,11 @@ function DBH_PopupInsertedFrameMixin:UpdateKeyDropdown(keyInfoToSelect)
         self.selectedKeyInfo = self.initInfo
     end
 
-    function IsSelected(data)
+    local function IsSelected(data)
         return self.selectedKeyInfo == data
     end
 
-    function SetSelected(data)
+    local function SetSelected(data)
         self.selectedKeyInfo = data
         self:InvokeOnChanged()
     end
