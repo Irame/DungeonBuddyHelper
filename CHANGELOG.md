@@ -1,3 +1,2 @@
-- Added button to Blizzard LFG frame.
-- Dialog can now be opened when at least one party member has a key.
-- Added addon compartment button.
+- Small changes to the UI.
+- Bugfixes and improvements.
