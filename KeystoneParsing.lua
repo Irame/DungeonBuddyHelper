@@ -1,6 +1,8 @@
 ---@class DBH_Private
 local private = select(2, ...)
 
+local L = private.L
+
 ---@class DungeonInfo
 ---@field activityId number the id of then activity
 ---@field dungeonShorthand string the showrthand of the dungeon (eg. "siege" for Siege of Boralus)
@@ -108,7 +110,7 @@ function private:GetKeystoneInfoForLink(keystoneLink)
 
     local info = dungeonInfo[dungeonID]
     if not info then
-        self.addon:Printf("Missing support for dungeon with map id '%d'. Please open a issue on CurseForge or GitHub.", dungeonID)
+        self.addon:Printf(L["Missing support for dungeon with map id '%d'. Please open a issue on CurseForge or GitHub."], dungeonID)
         return
     end
 
@@ -131,7 +133,7 @@ function private:GetKeystoneInfoForUnit(unit)
 
     local info = dungeonInfo[orlKLeyInfo.challengeMapID]
     if not info then
-        self.addon:Printf("Missing support for dungeon with map id '%d'. Please open a issue on CurseForge or GitHub.", orlKLeyInfo.challengeMapID)
+        self.addon:Printf(L["Missing support for dungeon with map id '%d'. Please open a issue on CurseForge or GitHub."], orlKLeyInfo.challengeMapID)
         return
     end
 

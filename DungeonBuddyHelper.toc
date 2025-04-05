@@ -8,6 +8,8 @@
 # External code + initialization
 embeds.xml
 
+locales.xml
+
 # Frames
 Frames/PopupInsertedFrame.xml
 Frames/LFGFrameButton.xml
