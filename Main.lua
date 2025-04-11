@@ -12,11 +12,62 @@ private.addon = addon
 
 private.openRaidLib = LibStub:GetLibrary("LibOpenRaid-1.0")
 
+---@type AceConfig.OptionsTable
+local options = {
+    type = "group",
+    name = L["DungeonBuddy Helper (NoP)"],
+    args = {
+        chatKeyLinks = {
+            type = "toggle",
+            name = L["Chat Key Links"],
+            desc = L["Enable links for DBH behind keystones in chat."],
+            get = function() return private.db.global.chatKeyLinks end,
+            set = function(_, value)
+                private.db.global.chatKeyLinks = value
+            end,
+            order = 1,
+        },
+        lfgFrameButton = {
+            type = "toggle",
+            name = L["LFG Frame Button"],
+            desc = L["Show the button for DBH inside the LFG frame."],
+            get = function() return private.db.global.lfgFrameButton end,
+            set = function(_, value)
+                private.db.global.lfgFrameButton = value
+                if private.lfgFrameButton then
+                    private.lfgFrameButton:SetShown(value)
+                end
+            end,
+            order = 2,
+        },
+        showHelpButton = {
+            type = "execute",
+            name = L["Help"],
+            desc = L["Show the help message in the chat frame."],
+            func = function()
+                addon:ShowHelpMessage()
+            end,
+            order = 3,
+        },
+    },
+}
+
 function addon:OnInitialize()
+    private.db = LibStub("AceDB-3.0"):New("DBHDB", {
+        global = {
+            chatKeyLinks = true,
+            lfgFrameButton = true,
+        },
+    }, true)
+
+    LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, options)
+    self.optionsFrame, self.optionsFrameId = LibStub("AceConfigDialog-3.0"):AddToBlizOptions(addonName, "DungeonBuddy Helper (NoP)")
+
     self:RegisterChatCommand("dbh", "ChatCommandHandler");
     self:RegisterChatCommand("lfg", "ChatCommandHandler");
 
-    CreateFrame("Button", "DBH_LFGFrameButton", LFGListFrame.CategorySelection, "DBH_LFGFrameButtonTemplate")
+    private.lfgFrameButton = CreateFrame("Button", "DBH_LFGFrameButton", LFGListFrame.CategorySelection, "DBH_LFGFrameButtonTemplate")
+    private.lfgFrameButton:SetShown(private.db.global.lfgFrameButton)
 
     self.WaitingForKeyUpdate = false
     self.OnKeystoneUpdate = function(unitName, keystoneInfo, allKeystonesInfo)
@@ -29,12 +80,34 @@ function addon:OnInitialize()
     private.openRaidLib.RegisterCallback(self, "KeystoneUpdate", "OnKeystoneUpdate")
 end
 
-function DBH_OnAddonCompartmentClick()
-    addon:ShowLFGFrameAndDiscordCommand()
+function DBH_OnAddonCompartmentClick(self, button)
+    if button == "RightButton" then
+        Settings.OpenToCategory(addon.optionsFrameId)
+    else
+        addon:ShowLFGFrameAndDiscordCommand()
+    end
 end
 
 function addon:ChatCommandHandler(args)
+    if args == "help" or args == "?" then
+        self:ShowHelpMessage()
+        return
+    end
+
+    if args == "opt" or args == "options" then
+        Settings.OpenToCategory(self.optionsFrameId)
+        return
+    end
+
     self:ShowLFGFrameAndDiscordCommand(args)
+end
+
+function addon:ShowHelpMessage()
+    self:Printf(L["Commands (%s or %s)"], "|cfff4d512/dbh|r","|cfff4d512/lfg|r")
+    DEFAULT_CHAT_FRAME:AddMessage("|cfff4d512/dbh help|r - " .. L["Shows this help message."])
+    DEFAULT_CHAT_FRAME:AddMessage("|cfff4d512/dbh opt|r - " .. L["Opens the addon options."])
+    DEFAULT_CHAT_FRAME:AddMessage("|cfff4d512/dbh|r - " .. L["Shows the Dungeon Buddy command for the key in your inventory."])
+    DEFAULT_CHAT_FRAME:AddMessage("|cfff4d512/dbh <keystoneLink>|r - " .. L["Shows the Dungeon Buddy command for the given keystone."])
 end
 
 ---Shows the Dungeon Buddy command to the player and opens the LFG frame.
