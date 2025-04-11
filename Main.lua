@@ -69,6 +69,8 @@ function addon:OnInitialize()
     private.lfgFrameButton = CreateFrame("Button", "DBH_LFGFrameButton", LFGListFrame.CategorySelection, "DBH_LFGFrameButtonTemplate")
     private.lfgFrameButton:SetShown(private.db.global.lfgFrameButton)
 
+    private:InitChatLinks()
+
     self.WaitingForKeyUpdate = false
     self.OnKeystoneUpdate = function(unitName, keystoneInfo, allKeystonesInfo)
         if self.WaitingForKeyUpdate and private:IterPartyKeys()() then

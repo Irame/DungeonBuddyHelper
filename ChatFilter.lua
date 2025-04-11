@@ -12,9 +12,6 @@ local function PartyChatFilter(self, event, msg, sender, ...)
     return false, msg, sender, ...
 end
 
-ChatFrame_AddMessageEventFilter("CHAT_MSG_PARTY", PartyChatFilter)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_PARTY_LEADER", PartyChatFilter)
-
 local function CustomLinkClicked(_, link)
     local mythicKeyData = link:match("DungeonBuddyHelper:(.+)")
     if mythicKeyData then
@@ -22,4 +19,8 @@ local function CustomLinkClicked(_, link)
     end
 end
 
-hooksecurefunc(ItemRefTooltip, "SetHyperlink", CustomLinkClicked)
+function private:InitChatLinks()
+    ChatFrame_AddMessageEventFilter("CHAT_MSG_PARTY", PartyChatFilter)
+    ChatFrame_AddMessageEventFilter("CHAT_MSG_PARTY_LEADER", PartyChatFilter)
+    hooksecurefunc(ItemRefTooltip, "SetHyperlink", CustomLinkClicked)
+end
