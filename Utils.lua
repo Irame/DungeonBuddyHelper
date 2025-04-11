@@ -1,6 +1,8 @@
 ---@class DBH_Private
 local private = select(2, ...)
 
+private.Enum = {}
+
 function private:IterPartyMembers()
     local i = -1
     return function()

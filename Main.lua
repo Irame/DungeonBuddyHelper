@@ -12,55 +12,75 @@ private.addon = addon
 
 private.openRaidLib = LibStub:GetLibrary("LibOpenRaid-1.0")
 
----@type AceConfig.OptionsTable
-local options = {
-    type = "group",
-    name = L["DungeonBuddy Helper (NoP)"],
-    args = {
-        chatKeyLinks = {
-            type = "toggle",
-            name = L["Chat Key Links"],
-            desc = L["Enable links for DBH behind keystones in chat."],
-            get = function() return private.db.global.chatKeyLinks end,
-            set = function(_, value)
-                private.db.global.chatKeyLinks = value
-            end,
-            order = 1,
+function addon:GenerateOptions()
+    ---@type AceConfig.OptionsTable
+    local options = {
+        type = "group",
+        name = L["DungeonBuddy Helper (NoP)"],
+        args = {
+            chatKeyLinks = {
+                type = "toggle",
+                name = L["Chat Key Links"],
+                desc = L["Enable links for DBH behind keystones in chat."],
+                get = function() return private.db.global.chatKeyLinks end,
+                set = function(_, value)
+                    private.db.global.chatKeyLinks = value
+                end,
+                order = 1,
+            },
+            lfgFrameButton = {
+                type = "toggle",
+                name = L["LFG Frame Button"],
+                desc = L["Show the button for DBH inside the LFG frame."],
+                get = function() return private.db.global.lfgFrameButton end,
+                set = function(_, value)
+                    private.db.global.lfgFrameButton = value
+                    if private.lfgFrameButton then
+                        private.lfgFrameButton:SetShown(value)
+                    end
+                end,
+                order = 2,
+            },
+            openLfgFrame = {
+                type = "select",
+                name = L["Open LFG Frame"],
+                desc = L["Select when/if to open the LFG frame."],
+                values = {
+                    [private.Enum.OpenLfgFrame.OnDialog] = L["On Dialog"],
+                    [private.Enum.OpenLfgFrame.OnOkay] = L["On Okay"],
+                    [private.Enum.OpenLfgFrame.Never] = L["Never"],
+                },
+                get = function() return private.db.global.openLfgFrame end,
+                set = function(_, value)
+                    private.db.global.openLfgFrame = value
+                end,
+                order = 3,
+            },
+            showHelpButton = {
+                type = "execute",
+                name = L["Help"],
+                desc = L["Show the help message in the chat frame."],
+                func = function()
+                    addon:ShowHelpMessage()
+                end,
+                order = 4,
+            },
         },
-        lfgFrameButton = {
-            type = "toggle",
-            name = L["LFG Frame Button"],
-            desc = L["Show the button for DBH inside the LFG frame."],
-            get = function() return private.db.global.lfgFrameButton end,
-            set = function(_, value)
-                private.db.global.lfgFrameButton = value
-                if private.lfgFrameButton then
-                    private.lfgFrameButton:SetShown(value)
-                end
-            end,
-            order = 2,
-        },
-        showHelpButton = {
-            type = "execute",
-            name = L["Help"],
-            desc = L["Show the help message in the chat frame."],
-            func = function()
-                addon:ShowHelpMessage()
-            end,
-            order = 3,
-        },
-    },
-}
+    }
+
+    return options
+end
 
 function addon:OnInitialize()
     private.db = LibStub("AceDB-3.0"):New("DBHDB", {
         global = {
             chatKeyLinks = true,
             lfgFrameButton = true,
+            openLfgFrame = private.Enum.OpenLfgFrame.OnDialog,
         },
     }, true)
 
-    LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, options)
+    LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, self:GenerateOptions())
     self.optionsFrame, self.optionsFrameId = LibStub("AceConfigDialog-3.0"):AddToBlizOptions(addonName, "DungeonBuddy Helper (NoP)")
 
     self:RegisterChatCommand("dbh", "ChatCommandHandler");

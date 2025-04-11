@@ -83,6 +83,12 @@ function private:GenerateCommand(info, completion)
     return string.format("/lfgquick quick_dungeon_string:%s %d%s %s %s", info.dungeonShorthand, info.level, completion and "c" or "t", GetPlayerRole(), GetMissingRoles())
 end
 
+private.Enum.OpenLfgFrame = {
+    Never = 0,
+    OnDialog = 1,
+    OnOkay = 2,
+}
+
 ---Creates a command used by the DungeonBuddy on the No Pressure Discord
 ---and shows a popup to the player where they can copy it
 ---@param info KeystoneInfo The info of the keystone
@@ -98,7 +104,9 @@ function private:ShowDungeonBuddyCommandToPlayer(info)
 
             this.insertedFrame.OnChanged = function(keyInfo, completion)
                 this.data = keyInfo
-                private:ShowLFGFrameWithEntryCreationForActivity(keyInfo, completion)
+                if private.db.global.openLfgFrame == private.Enum.OpenLfgFrame.OnDialog then
+                    private:ShowLFGFrameWithEntryCreationForActivity(keyInfo, completion)
+                end
                 updateText(keyInfo)
             end
 
@@ -108,6 +116,9 @@ function private:ShowDungeonBuddyCommandToPlayer(info)
             this.insertedFrame.OnChanged = nil
         end,
         OnAccept = function(this, ...)
+            if private.db.global.openLfgFrame == private.Enum.OpenLfgFrame.OnOkay then
+                private:ShowLFGFrameWithEntryCreationForActivity(this.data, this.insertedFrame:IsCompletionChecked())
+            end
             if LFGListFrame.EntryCreation.Name:IsVisible() and this.data then
                 local helpTipInfo = {
                     text = L["Enter the name you listed you group as in the NoP discord (e.g. NoP %s XX)"]:format(strupper(this.data.dungeonShorthand)),
