@@ -72,7 +72,7 @@ function addon:GenerateOptions()
 end
 
 function addon:OnInitialize()
-    private.db = LibStub("AceDB-3.0"):New("DBHDB", {
+    private.db = LibStub("AceDB-3.0"):New("DungeonBuddyHelperDB", {
         global = {
             chatKeyLinks = true,
             lfgFrameButton = true,

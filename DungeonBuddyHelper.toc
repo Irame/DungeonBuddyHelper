@@ -4,6 +4,7 @@
 ## Version: @project-version@
 ## IconTexture: Interface\AddOns\DungeonBuddyHelper\Images\Icon
 ## AddonCompartmentFunc: DBH_OnAddonCompartmentClick
+## SavedVariables: DungeonBuddyHelperDB
 
 # External code + initialization
 embeds.xml
