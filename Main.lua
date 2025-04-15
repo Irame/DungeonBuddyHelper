@@ -12,7 +12,21 @@ private.addon = addon
 
 private.openRaidLib = LibStub:GetLibrary("LibOpenRaid-1.0")
 
+local helpHeader = L["Commands (%s or %s)"]:format("|cfff4d512/dbh|r", "|cfff4d512/lfg|r")
+
+local helpLines = {
+    "|cfff4d512/dbh help|r - " .. L["Shows this help message."],
+    "|cfff4d512/dbh opt|r - " .. L["Opens the addon options."],
+    "|cfff4d512/dbh|r - " .. L["Shows the Dungeon Buddy command for the key in your inventory."],
+    "|cfff4d512/dbh <keystoneLink>|r - " .. L["Shows the Dungeon Buddy command for the given keystone."],
+}
+
 function addon:GenerateOptions()
+    local helpDesc = helpHeader
+    for i, line in ipairs(helpLines) do
+        helpDesc = helpDesc .. "\n" .. line
+    end
+
     ---@type AceConfig.OptionsTable
     local options = {
         type = "group",
@@ -56,13 +70,10 @@ function addon:GenerateOptions()
                 end,
                 order = 3,
             },
-            showHelpButton = {
-                type = "execute",
-                name = L["Help"],
-                desc = L["Show the help message in the chat frame."],
-                func = function()
-                    addon:ShowHelpMessage()
-                end,
+            commandHelp = {
+                type = "description",
+                name = helpDesc,
+                fontSize = "medium",
                 order = 4,
             },
         },
@@ -125,11 +136,10 @@ function addon:ChatCommandHandler(args)
 end
 
 function addon:ShowHelpMessage()
-    self:Printf(L["Commands (%s or %s)"], "|cfff4d512/dbh|r","|cfff4d512/lfg|r")
-    DEFAULT_CHAT_FRAME:AddMessage("|cfff4d512/dbh help|r - " .. L["Shows this help message."])
-    DEFAULT_CHAT_FRAME:AddMessage("|cfff4d512/dbh opt|r - " .. L["Opens the addon options."])
-    DEFAULT_CHAT_FRAME:AddMessage("|cfff4d512/dbh|r - " .. L["Shows the Dungeon Buddy command for the key in your inventory."])
-    DEFAULT_CHAT_FRAME:AddMessage("|cfff4d512/dbh <keystoneLink>|r - " .. L["Shows the Dungeon Buddy command for the given keystone."])
+    self:Print(helpHeader)
+    for i, line in ipairs(helpLines) do
+        DEFAULT_CHAT_FRAME:AddMessage(line)
+    end
 end
 
 ---Shows the Dungeon Buddy command to the player and opens the LFG frame.
