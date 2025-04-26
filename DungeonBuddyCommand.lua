@@ -21,7 +21,7 @@ end
 
 ---Gets the player role in the single char format
 ---@return "t" | "h" | "d" | ""
-local function GetPlayerRole()
+function private:GetPlayerRole()
     local role
     if IsInGroup(LE_PARTY_CATEGORY_HOME) then
         role = UnitGroupRolesAssigned("player")
@@ -33,7 +33,7 @@ end
 
 --- Function to get the roles that are missing to form a dungeon group
 ---@return string
-local function GetMissingRoles()
+function private:GetMissingRoles()
     if IsInRaid(LE_PARTY_CATEGORY_HOME) then
         return ""
     end
@@ -44,7 +44,7 @@ local function GetMissingRoles()
     for unit in private:IterPartyMembers() do
         local role
         if unit == "player" then
-            role = GetPlayerRole()
+            role = private:GetPlayerRole()
         else
             role = GetShortRole(UnitGroupRolesAssigned(unit))
         end
@@ -79,8 +79,10 @@ local function NOP() end
 
 ---Generates a command string for the DungeonBuddy on the No Pressure Discord
 ---@param info KeystoneInfo The info of the keystone
-function private:GenerateCommand(info, completion)
-    return string.format("/lfgquick quick_dungeon_string:%s %d%s %s %s", info.dungeonShorthand, info.level, completion and "c" or "t", GetPlayerRole(), GetMissingRoles())
+---@param completion boolean Whether the run is a completion or a time trial
+---@param missingRoles string The roles that are missing to form a dungeon group
+function private:GenerateCommand(info, completion, missingRoles)
+    return string.format("/lfgquick quick_dungeon_string:%s %d%s %s %s", info.dungeonShorthand, info.level, completion and "c" or "t", private:GetPlayerRole(), missingRoles)
 end
 
 private.Enum.OpenLfgFrame = {

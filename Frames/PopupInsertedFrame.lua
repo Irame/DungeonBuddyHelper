@@ -1,7 +1,7 @@
 ---@class DBH_Private
 local private = select(2, ...)
 
----@class DBH_RunTypeRadioButton : CheckButton
+---@class DBH_RunTypeRadioButton : UIRadialButtonTemplate
 ---@field LabelText string
 ---@field text FontString
 DBH_RunTypeRadioButtonMixin = {}
@@ -43,6 +43,7 @@ end
 ---@field TimeRadioButton DBH_RunTypeRadioButton
 ---@field CompletionRadioButton DBH_RunTypeRadioButton
 ---@field KeySelectDropdown any
+---@field RoleSelect DBH_RoleSelect
 ---@field InputBox DBH_CommandInputBox
 ---@field OnChanged fun(keyInfo: UnitKeystoneInfo|KeystoneInfo, completion: boolean)
 DBH_PopupInsertedFrameMixin = {}
@@ -133,14 +134,12 @@ function DBH_PopupInsertedFrameMixin:InvokeOnChanged()
         self.OnChanged(keyInfo, completion)
     end
 
-    self:UpdateCommand(keyInfo, completion)
+    self:UpdateCommand()
 end
 
 ---Update the command
----@param keyInfo KeystoneInfo
----@param completion boolean
-function DBH_PopupInsertedFrameMixin:UpdateCommand(keyInfo, completion)
-    local command = private:GenerateCommand(keyInfo, completion)
+function DBH_PopupInsertedFrameMixin:UpdateCommand()
+    local command = private:GenerateCommand(self.selectedKeyInfo, self:IsCompletionChecked(), self.RoleSelect:GetShortRolesString())
     self.InputBox:SetCommand(command)
 end
 
@@ -166,11 +165,23 @@ function DBH_PopupInsertedFrameMixin:OnLoad()
             self:UpdateKeyDropdown(self.selectedKeyInfo)
         end
     end
+
+    self.RoleSelect.OnChanged = function()
+        self:InvokeOnChanged()
+    end
+end
+
+function DBH_PopupInsertedFrameMixin:UpdateRoleSelect()
+    local missingRoles = private:GetMissingRoles()
+    self.RoleSelect:SetRolesByString(missingRoles)
+    self.RoleSelect:SetLockedRole(private:GetPlayerRole())
 end
 
 function DBH_PopupInsertedFrameMixin:OnShow()
     private.openRaidLib.RegisterCallback(self, "KeystoneUpdate", "OnKeystoneUpdate")
     private.openRaidLib:RequestKeystoneDataFromParty()
+
+    self:UpdateRoleSelect()
 
     self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
     self:RegisterEvent("PLAYER_ROLES_ASSIGNED")
@@ -184,5 +195,6 @@ function DBH_PopupInsertedFrameMixin:OnHide()
 end
 
 function DBH_PopupInsertedFrameMixin:OnEvent()
-    self:UpdateCommand(self.selectedKeyInfo, self:IsCompletionChecked())
+    self:UpdateRoleSelect()
+    self:UpdateCommand()
 end

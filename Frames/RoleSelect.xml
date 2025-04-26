@@ -1,0 +1,58 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Script file="RoleSelect.lua"/>
+    <CheckButton name="DBH_RoleButtonTemplate" mixin="DBH_RoleButtonMixin" virtual="true">
+        <Size x="24" y="24"/>
+        <NormalTexture/>
+        <CheckedTexture/>
+        <HighlightTexture atlas="UI-LFG-RoleIcon-Incentive"/>
+        <Scripts>
+            <OnLoad method="OnLoad"/>
+            <OnClick method="OnClick"/>
+        </Scripts>
+    </CheckButton>
+    <Frame name="DBH_RoleSelectTemplate" mixin="DBH_RoleSelectMixin" virtual="true">
+        <Size x="128" y="24"/>
+        <Frames>
+            <CheckButton inherits="DBH_RoleButtonTemplate" parentKey="TankButton" parentArray="Buttons">
+                <KeyValues>
+                    <KeyValue key="role" value="t" type="string"/>
+                </KeyValues>
+                <Anchors>
+                    <Anchor point="LEFT"/>
+                </Anchors>
+            </CheckButton>
+            <CheckButton inherits="DBH_RoleButtonTemplate" parentKey="HealButton" parentArray="Buttons">
+                <KeyValues>
+                    <KeyValue key="role" value="h" type="string"/>
+                </KeyValues>
+                <Anchors>
+                    <Anchor point="LEFT" relativeKey="$parent.TankButton" relativePoint="RIGHT" x="2"/>
+                </Anchors>
+            </CheckButton>
+            <CheckButton inherits="DBH_RoleButtonTemplate" parentKey="Damage1Button" parentArray="Buttons">
+                <KeyValues>
+                    <KeyValue key="role" value="d" type="string"/>
+                </KeyValues>
+                <Anchors>
+                    <Anchor point="LEFT" relativeKey="$parent.HealButton" relativePoint="RIGHT" x="2"/>
+                </Anchors>
+            </CheckButton>
+            <CheckButton inherits="DBH_RoleButtonTemplate" parentKey="Damage2Button" parentArray="Buttons">
+                <KeyValues>
+                    <KeyValue key="role" value="d" type="string"/>
+                </KeyValues>
+                <Anchors>
+                    <Anchor point="LEFT" relativeKey="$parent.Damage1Button" relativePoint="RIGHT" x="2"/>
+                </Anchors>
+            </CheckButton>
+            <CheckButton inherits="DBH_RoleButtonTemplate" parentKey="Damage3Button" parentArray="Buttons">
+                <KeyValues>
+                    <KeyValue key="role" value="d" type="string"/>
+                </KeyValues>
+                <Anchors>
+                    <Anchor point="LEFT" relativeKey="$parent.Damage2Button" relativePoint="RIGHT" x="2"/>
+                </Anchors>
+            </CheckButton>
+        </Frames>
+    </Frame>
+</Ui>

@@ -12,6 +12,7 @@ embeds.xml
 locales.xml
 
 # Frames
+Frames/RoleSelect.xml
 Frames/PopupInsertedFrame.xml
 Frames/LFGFrameButton.xml
 

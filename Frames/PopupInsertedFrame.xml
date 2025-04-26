@@ -30,6 +30,11 @@
                     <KeyValue key="LabelText" value="Completion"/>
                 </KeyValues>
             </CheckButton>
+            <Frame inherits="DBH_RoleSelectTemplate" parentKey="RoleSelect">
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.CompletionRadioButton" relativePoint="BOTTOMLEFT" x="50" y="-5"/>
+                </Anchors>
+            </Frame>
             <EditBox inherits="InputBoxTemplate" parentKey="InputBox" mixin="DBH_CommandInputBoxMixin">
                 <Size y="20"/>
                 <Anchors>
@@ -43,7 +48,19 @@
                 </Scripts>
             </EditBox>
         </Frames>
-        <Size x="275" y="105"/>
+        <Layers>
+            <Layer>
+                <FontString text="Missing Roles:" inherits="GameFontNormalSmall">
+                    <Scripts>
+                        <OnLoad function="MPLM_LocalizeFontString"/>
+                    </Scripts>
+                    <Anchors>
+                        <Anchor point="RIGHT" relativeKey="$parent.RoleSelect" relativePoint="LEFT" x="-5" y="0"/>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+        <Size x="275" y="135"/>
         <Scripts>
             <OnLoad method="OnLoad"/>
             <OnShow method="OnShow"/>
