@@ -1,2 +1,1 @@
-- updated for 11.1.5
-- Added visualization for missing roles
+- updated for 11.2.0
