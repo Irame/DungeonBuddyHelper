@@ -100,22 +100,20 @@ function private:ShowDungeonBuddyCommandToPlayer(info)
         text = popupTextTemplate,
         button1 = OKAY,
         OnShow = function(this, ...)
-            local updateText = function(keyInfo)
-                this.text:SetFormattedText(popupTextTemplate, KeyLevelToDiscordChannel(keyInfo.level))
-            end
-
             this.insertedFrame.OnChanged = function(keyInfo, completion)
                 this.data = keyInfo
                 if private.db.global.openLfgFrame == private.Enum.OpenLfgFrame.OnDialog then
                     private:ShowLFGFrameWithEntryCreationForActivity(keyInfo, completion)
                 end
-                updateText(keyInfo)
+
+                this:GetTextFontString():SetFormattedText(popupTextTemplate, KeyLevelToDiscordChannel(keyInfo.level))
             end
 
             this.insertedFrame:Initialize(this.data)
         end,
         OnHide = function(this, ...)
             this.insertedFrame.OnChanged = nil
+            this.insertedFrame:Hide();
         end,
         OnAccept = function(this, ...)
             if private.db.global.openLfgFrame == private.Enum.OpenLfgFrame.OnOkay then
@@ -137,5 +135,8 @@ function private:ShowDungeonBuddyCommandToPlayer(info)
         hideOnEscape = 1
     }
 
-    StaticPopup_Show("SHOW_DB_COMMAND", KeyLevelToDiscordChannel(info.level), nil, info, _G["DBH_PopupInsertedFrame"])
+    local insertedFrame = _G["DBH_PopupInsertedFrame"]
+    insertedFrame:Show();
+
+    StaticPopup_Show("SHOW_DB_COMMAND", KeyLevelToDiscordChannel(info.level), nil, info, insertedFrame)
 end
