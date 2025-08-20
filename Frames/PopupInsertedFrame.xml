@@ -1,11 +1,6 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <Script file="PopupInsertedFrame.lua"/>
-    <CheckButton name="DBH_RunTypeRadioButtonTemplate" inherits="UIRadialButtonTemplate" mixin="DBH_RunTypeRadioButtonMixin" virtual="true">
-		<Scripts>
-			<OnClick method="OnClick"/>
-			<OnLoad method="OnLoad"/>
-		</Scripts>
-	</CheckButton>
+
     <Frame name="DBH_PopupInsertedFrame" mixin="DBH_PopupInsertedFrameMixin" hidden="true">
         <Frames>
             <DropdownButton parentKey="KeySelectDropdown" inherits="WowStyle1DropdownTemplate">
