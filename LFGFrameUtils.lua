@@ -185,9 +185,17 @@ end
 
 ---Shows the LFG frame with the entry creation for the activity passed
 ---@param keyInfo KeystoneInfo
----@param completion boolean
-function private:ShowLFGFrameWithEntryCreationForActivity(keyInfo, completion)
+---@param runType RunType
+function private:ShowLFGFrameWithEntryCreationForActivity(keyInfo, runType)
     HelpTip:Hide(LFGListFrame.EntryCreation.Name)
     PVEFrame_ShowFrame("GroupFinderFrame", "LFGListPVEStub");
-    LFGListEntryCreation_Show(LFGListFrame.EntryCreation, Enum.LFGListFilter.PvE, GROUP_FINDER_CATEGORY_ID_DUNGEONS, 0, keyInfo.activityId, completion and Enum.LFGEntryPlaystyle.Casual or Enum.LFGEntryPlaystyle.Hardcore);
+
+	local playstyle = Enum.LFGEntryPlaystyle.Standard
+	if runType == private.Enum.RunType.TimeOrAbandon then
+		playstyle = Enum.LFGEntryPlaystyle.Hardcore
+	elseif runType == private.Enum.RunType.VaultCompletion then
+		playstyle = Enum.LFGEntryPlaystyle.Casual
+	end
+
+    LFGListEntryCreation_Show(LFGListFrame.EntryCreation, Enum.LFGListFilter.PvE, GROUP_FINDER_CATEGORY_ID_DUNGEONS, 0, keyInfo.activityId, playstyle);
 end

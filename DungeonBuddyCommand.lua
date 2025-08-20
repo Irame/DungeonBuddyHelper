@@ -77,12 +77,19 @@ end
 
 local function NOP() end
 
+---@enum RunType
+private.Enum.RunType = {
+    TimeButComplete = "tbc",
+    TimeOrAbandon = "toa",
+    VaultCompletion = "vc",
+}
+
 ---Generates a command string for the DungeonBuddy on the No Pressure Discord
 ---@param info KeystoneInfo The info of the keystone
----@param completion boolean Whether the run is a completion or a time trial
+---@param runType RunType The type of the run
 ---@param missingRoles string The roles that are missing to form a dungeon group
-function private:GenerateCommand(info, completion, missingRoles)
-    return string.format("/lfgquick quick_dungeon_string:%s %d%s %s %s", info.dungeonShorthand, info.level, completion and "c" or "t", private:GetPlayerRole(), missingRoles)
+function private:GenerateCommand(info, runType, missingRoles)
+    return string.format("/lfgquick quick_dungeon_string:%s %d%s %s %s", info.dungeonShorthand, info.level, runType, private:GetPlayerRole(), missingRoles)
 end
 
 private.Enum.OpenLfgFrame = {
@@ -100,10 +107,10 @@ function private:ShowDungeonBuddyCommandToPlayer(info)
         text = popupTextTemplate,
         button1 = OKAY,
         OnShow = function(this, ...)
-            this.insertedFrame.OnChanged = function(keyInfo, completion)
+            this.insertedFrame.OnChanged = function(keyInfo, runType)
                 this.data = keyInfo
                 if private.db.global.openLfgFrame == private.Enum.OpenLfgFrame.OnDialog then
-                    private:ShowLFGFrameWithEntryCreationForActivity(keyInfo, completion)
+                    private:ShowLFGFrameWithEntryCreationForActivity(keyInfo, runType)
                 end
 
                 this:GetTextFontString():SetFormattedText(popupTextTemplate, KeyLevelToDiscordChannel(keyInfo.level))

@@ -1,19 +1,7 @@
 ---@class DBH_Private
 local private = select(2, ...)
 
----@class DBH_RunTypeRadioButton : UIRadialButtonTemplate
----@field LabelText string
----@field text FontString
-DBH_RunTypeRadioButtonMixin = {}
-
-function DBH_RunTypeRadioButtonMixin:OnClick()
-    local parent = self:GetParent() --[[@as DBH_PopupInsertedFrame]];
-    parent:RunTypeRadioButtonClicked(self:GetID());
-end
-
-function DBH_RunTypeRadioButtonMixin:OnLoad()
-    self.text:SetText(self.LabelText);
-end
+local L = private.L
 
 ---@class DBH_CommandInputBox : EditBox
 DBH_CommandInputBoxMixin = {}
@@ -40,12 +28,11 @@ function DBH_CommandInputBoxMixin:SetCommand(command)
 end
 
 ---@class DBH_PopupInsertedFrame : Frame
----@field TimeRadioButton DBH_RunTypeRadioButton
----@field CompletionRadioButton DBH_RunTypeRadioButton
----@field KeySelectDropdown any
+---@field RunTypeDropdown WowStyle1DropdownTemplate
+---@field KeySelectDropdown WowStyle1DropdownTemplate
 ---@field RoleSelect DBH_RoleSelect
 ---@field InputBox DBH_CommandInputBox
----@field OnChanged fun(keyInfo: UnitKeystoneInfo|KeystoneInfo, completion: boolean)
+---@field OnChanged fun(keyInfo: UnitKeystoneInfo|KeystoneInfo, runType: RunType)
 DBH_PopupInsertedFrameMixin = {}
 
 local function AreKeystoneInfosEqual(info1, info2)
@@ -110,28 +97,28 @@ function DBH_PopupInsertedFrameMixin:UpdateKeyDropdown(keyInfoToSelect)
 	end);
 end
 
-function DBH_PopupInsertedFrameMixin:RunTypeRadioButtonClicked(id)
-    if (id == 1) then
-        self.TimeRadioButton:SetChecked(true)
-        self.CompletionRadioButton:SetChecked(false)
-    else
-        self.TimeRadioButton:SetChecked(false)
-        self.CompletionRadioButton:SetChecked(true)
+function DBH_PopupInsertedFrameMixin:UpdateRunTypeDropdown()
+    self.selectedRunType = self.selectedRunType or private.Enum.RunType.TimeButComplete
+
+    local function IsSelected(data)
+        return self.selectedRunType == data
     end
 
-    self:InvokeOnChanged()
-end
+    local function SetSelected(data)
+        self.selectedRunType = data
+        self:InvokeOnChanged()
+    end
 
-function DBH_PopupInsertedFrameMixin:IsCompletionChecked()
-    return self.CompletionRadioButton:GetChecked()
+    self.RunTypeDropdown:SetupMenu(function(dropdown, rootDescription)
+        rootDescription:CreateRadio(L["Time but complete"], IsSelected, SetSelected, private.Enum.RunType.TimeButComplete);
+        rootDescription:CreateRadio(L["Time or abandon"], IsSelected, SetSelected, private.Enum.RunType.TimeOrAbandon);
+        rootDescription:CreateRadio(L["Vault completion"], IsSelected, SetSelected, private.Enum.RunType.VaultCompletion);
+    end);
 end
 
 function DBH_PopupInsertedFrameMixin:InvokeOnChanged()
-    local keyInfo = self.selectedKeyInfo
-    local completion = self:IsCompletionChecked()
-
     if self.OnChanged then
-        self.OnChanged(keyInfo, completion)
+        self.OnChanged(self.selectedKeyInfo, self.selectedRunType)
     end
 
     self:UpdateCommand()
@@ -139,7 +126,7 @@ end
 
 ---Update the command
 function DBH_PopupInsertedFrameMixin:UpdateCommand()
-    local command = private:GenerateCommand(self.selectedKeyInfo, self:IsCompletionChecked(), self.RoleSelect:GetShortRolesString())
+    local command = private:GenerateCommand(self.selectedKeyInfo, self.selectedRunType, self.RoleSelect:GetShortRolesString())
     self.InputBox:SetCommand(command)
 end
 
@@ -148,15 +135,10 @@ end
 function DBH_PopupInsertedFrameMixin:Initialize(info)
     self.initInfo = info
 
-    self:ResetRadioButtons()
+    self:UpdateRunTypeDropdown()
     self:UpdateKeyDropdown(info)
 
     self:InvokeOnChanged()
-end
-
-function DBH_PopupInsertedFrameMixin:ResetRadioButtons()
-    self.TimeRadioButton:SetChecked(true)
-    self.CompletionRadioButton:SetChecked(false)
 end
 
 function DBH_PopupInsertedFrameMixin:OnLoad()
