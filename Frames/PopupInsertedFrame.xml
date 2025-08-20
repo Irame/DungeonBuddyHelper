@@ -12,12 +12,12 @@
             <DropdownButton parentKey="RunTypeDropdown" inherits="WowStyle1DropdownTemplate">
                 <Size x="200" y="25"></Size>
                 <Anchors>
-                    <Anchor point="TOPLEFT" relativeKey="$parent.KeySelectDropdown" relativePoint="BOTTOMLEFT" y="-5"/>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.KeySelectDropdown" relativePoint="BOTTOMLEFT" y="-10"/>
                 </Anchors>
             </DropdownButton>
             <Frame inherits="DBH_RoleSelectTemplate" parentKey="RoleSelect">
                 <Anchors>
-                    <Anchor point="TOPLEFT" relativeKey="$parent.RunTypeDropdown" relativePoint="BOTTOMLEFT" x="50" y="-5"/>
+                    <Anchor point="TOPLEFT" relativeKey="$parent.RunTypeDropdown" relativePoint="BOTTOMLEFT" x="50" y="-10"/>
                 </Anchors>
             </Frame>
             <EditBox inherits="InputBoxTemplate" parentKey="InputBox" mixin="DBH_CommandInputBoxMixin">
