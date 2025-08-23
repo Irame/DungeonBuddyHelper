@@ -88,6 +88,7 @@ function addon:OnInitialize()
             chatKeyLinks = true,
             lfgFrameButton = true,
             openLfgFrame = private.Enum.OpenLfgFrame.OnDialog,
+            selectedRunType = private.Enum.RunType.TimeButComplete
         },
     }, true)
 

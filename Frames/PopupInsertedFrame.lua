@@ -98,14 +98,12 @@ function DBH_PopupInsertedFrameMixin:UpdateKeyDropdown(keyInfoToSelect)
 end
 
 function DBH_PopupInsertedFrameMixin:UpdateRunTypeDropdown()
-    self.selectedRunType = self.selectedRunType or private.Enum.RunType.TimeButComplete
-
     local function IsSelected(data)
-        return self.selectedRunType == data
+        return private.db.global.selectedRunType == data
     end
 
     local function SetSelected(data)
-        self.selectedRunType = data
+        private.db.global.selectedRunType = data
         self:InvokeOnChanged()
     end
 
@@ -118,7 +116,7 @@ end
 
 function DBH_PopupInsertedFrameMixin:InvokeOnChanged()
     if self.OnChanged then
-        self.OnChanged(self.selectedKeyInfo, self.selectedRunType)
+        self.OnChanged(self.selectedKeyInfo, private.db.global.selectedRunType)
     end
 
     self:UpdateCommand()
@@ -128,7 +126,7 @@ end
 function DBH_PopupInsertedFrameMixin:UpdateCommand()
     local command = ""
     if private:IsKeySupportedByDungeonBuddy(self.selectedKeyInfo) then
-        command = private:GenerateCommand(self.selectedKeyInfo, self.selectedRunType, self.RoleSelect:GetShortRolesString())
+        command = private:GenerateCommand(self.selectedKeyInfo, private.db.global.selectedRunType, self.RoleSelect:GetShortRolesString())
     end
     self.InputBox:SetCommand(command)
 end
