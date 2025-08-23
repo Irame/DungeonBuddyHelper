@@ -1,1 +1,3 @@
-- updated for 11.2.0
+- added russian translation
+- added error when selecting keys above level 11
+- minor bugfixes
