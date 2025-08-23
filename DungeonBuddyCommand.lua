@@ -71,11 +71,17 @@ local function KeyLevelToDiscordChannel(level)
     elseif level <= 9 then
         return "lfg-m7-m9"
     else
-        return "lfg-m10"
+        return "lfg-m10-m11"
     end
 end
 
 local function NOP() end
+
+---Checks if the key level is supported by the DungeonBuddy bot
+---@param keyInfo KeystoneInfo The info of the keystone
+function private:IsKeySupportedByDungeonBuddy(keyInfo)
+    return keyInfo and keyInfo.level < 12
+end
 
 ---@enum RunType
 private.Enum.RunType = {
@@ -103,6 +109,7 @@ private.Enum.OpenLfgFrame = {
 ---@param info KeystoneInfo The info of the keystone
 function private:ShowDungeonBuddyCommandToPlayer(info)
     local popupTextTemplate = L["Select key and playstyle and copy'n'paste the command in the '%s' NoP discord channel."]
+    local notSupportedKeyLevelText = L["The DungeonBuddy bot only supports dungeons below level 12. Please use the 'Boiler Room' to look for people manually."]
     StaticPopupDialogs["SHOW_DB_COMMAND"] = StaticPopupDialogs["SHOW_DB_COMMAND"] or {
         text = popupTextTemplate,
         button1 = OKAY,
@@ -113,7 +120,11 @@ function private:ShowDungeonBuddyCommandToPlayer(info)
                     private:ShowLFGFrameWithEntryCreationForActivity(keyInfo, runType)
                 end
 
-                this:GetTextFontString():SetFormattedText(popupTextTemplate, KeyLevelToDiscordChannel(keyInfo.level))
+                if private:IsKeySupportedByDungeonBuddy(keyInfo) then
+                    this:GetTextFontString():SetFormattedText(popupTextTemplate, KeyLevelToDiscordChannel(keyInfo.level))
+                else
+                    this:GetTextFontString():SetText("|cffff3636" .. notSupportedKeyLevelText .. "|r")
+                end
             end
 
             this.insertedFrame:Initialize(this.data)

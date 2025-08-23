@@ -126,7 +126,10 @@ end
 
 ---Update the command
 function DBH_PopupInsertedFrameMixin:UpdateCommand()
-    local command = private:GenerateCommand(self.selectedKeyInfo, self.selectedRunType, self.RoleSelect:GetShortRolesString())
+    local command = ""
+    if private:IsKeySupportedByDungeonBuddy(self.selectedKeyInfo) then
+        command = private:GenerateCommand(self.selectedKeyInfo, self.selectedRunType, self.RoleSelect:GetShortRolesString())
+    end
     self.InputBox:SetCommand(command)
 end
 
