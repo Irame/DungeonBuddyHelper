@@ -108,6 +108,9 @@ private.Enum.OpenLfgFrame = {
 ---and shows a popup to the player where they can copy it
 ---@param info KeystoneInfo The info of the keystone
 function private:ShowDungeonBuddyCommandToPlayer(info)
+    local insertedFrame = _G["DBH_PopupInsertedFrame"]
+    insertedFrame:Show();
+
     local popupTextTemplate = L["Select key and playstyle and copy'n'paste the command in the '%s' NoP discord channel."]
     local notSupportedKeyLevelText = L["The DungeonBuddy bot only supports dungeons below level 12. Please use the 'Boiler Room' to look for people manually."]
     StaticPopupDialogs["SHOW_DB_COMMAND"] = StaticPopupDialogs["SHOW_DB_COMMAND"] or {
@@ -147,14 +150,15 @@ function private:ShowDungeonBuddyCommandToPlayer(info)
                 HelpTip:Show(LFGListFrame.EntryCreation.Name, helpTipInfo, LFGListFrame.EntryCreation.Name)
             end
         end,
-        OnCancel = NOP,
+        OnCancel = function(this, ...)
+            this.insertedFrame.OnChanged = nil
+            this.insertedFrame:Hide();
+        end,
         timeout = 0,
         whileDead = 1,
-        hideOnEscape = 1
+        hideOnEscape = 1,
+        editBoxWidth = 285,
     }
-
-    local insertedFrame = _G["DBH_PopupInsertedFrame"]
-    insertedFrame:Show();
 
     StaticPopup_Show("SHOW_DB_COMMAND", KeyLevelToDiscordChannel(info.level), nil, info, insertedFrame)
 end

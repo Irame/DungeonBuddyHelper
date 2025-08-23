@@ -45,7 +45,7 @@
                 </FontString>
             </Layer>
         </Layers>
-        <Size x="275" y="135"/>
+        <Size x="290" y="135"/>
         <Scripts>
             <OnLoad method="OnLoad"/>
             <OnShow method="OnShow"/>
