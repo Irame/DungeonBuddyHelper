@@ -36,11 +36,13 @@ end
 DBH_RoleSelectMixin = {}
 
 function DBH_RoleSelectMixin:SetLockedRole(role)
+    local buttonDisabled = false
     for i = #self.Buttons, 1, -1 do
         local button = self.Buttons[i]
-        if button.role == role then
+        if button.role == role and not buttonDisabled then
             button:Disable()
             button:SetChecked(false)
+            buttonDisabled = true
         else
             button:Enable()
         end
