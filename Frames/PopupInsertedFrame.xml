@@ -17,7 +17,7 @@
             </DropdownButton>
             <Frame inherits="DBH_RoleSelectTemplate" parentKey="RoleSelect">
                 <Anchors>
-                    <Anchor point="TOPLEFT" relativeKey="$parent.RunTypeDropdown" relativePoint="BOTTOMLEFT" x="50" y="-10"/>
+                    <Anchor point="TOPRIGHT" relativeKey="$parent.RunTypeDropdown" relativePoint="BOTTOMRIGHT" x="0" y="-10"/>
                 </Anchors>
             </Frame>
             <EditBox inherits="InputBoxTemplate" parentKey="InputBox" mixin="DBH_CommandInputBoxMixin">
