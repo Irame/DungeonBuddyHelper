@@ -1,3 +1,1 @@
-- added russian translation
-- added error when selecting keys above level 11
-- minor bugfixes
+- fixed russian translation (and added templates for other languages)
