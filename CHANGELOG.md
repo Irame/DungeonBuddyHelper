@@ -1,1 +1,1 @@
-- fixed russian translation (and added templates for other languages)
+- fixed missing libs
