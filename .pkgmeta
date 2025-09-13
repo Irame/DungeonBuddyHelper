@@ -1,5 +1,9 @@
 package-as: DungeonBuddyHelper
 
+ignore:
+  - Images\Logo400.png
+  - Images\Infographic.svg
+
 manual-changelog:
   filename: CHANGELOG.md
   markup-type: markdown

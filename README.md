@@ -8,3 +8,7 @@ To use just type `/lfg` or `/dbh` to create a DungeonBuddy-Command for the key i
 You can also paste a key after the command with <kbd>Shift</kbd>+<kbd>Left Click</kbd> to use this key instead.
 
 Afterwards, copy and paste the command in the appropriate discord channel. Use the bots generated group name for your listing ingame.
+
+## Infographic
+
+![Infographic showing how to use DBH](./Images/Infographic.svg)
