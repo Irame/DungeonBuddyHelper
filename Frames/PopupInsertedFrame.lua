@@ -129,7 +129,7 @@ function DBH_PopupInsertedFrameMixin:SetCommand(command)
     if command:find("\n") then
         self.MultiLineInput:Show()
         self.SingleLineInputBox:Hide()
-        self:SetHeight(210)
+        self:SetHeight(215)
         self.MultiLineInputBox:SetCommand(command)
     else
         self.MultiLineInput:Hide()

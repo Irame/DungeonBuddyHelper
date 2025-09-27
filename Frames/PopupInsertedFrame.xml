@@ -33,29 +33,43 @@
                 </Scripts>
                 <FontString inherits="ChatFontNormal"/>
             </EditBox>
-			<Frame parentKey="MultiLineInput" inherits="TooltipBackdropTemplate">
-				<Size y="95"/>
+
+			<Frame name="DBH_MultiLineInput" parentKey="MultiLineInput" inherits="TooltipBackdropTemplate">
+				<Size y="100"/>
                 <Anchors>
                     <Anchor point="BOTTOMLEFT"/>
                     <Anchor point="BOTTOMRIGHT"/>
                 </Anchors>
                 <Frames>
-                    <EditBox parentKey="Text" multiLine="true" mixin="DBH_CommandInputBoxMixin" >
+                    <ScrollFrame name="DBH_MultiLineInputScrollFrame" parentKey="ScrollFrame" inherits="ScrollFrameTemplate">
+                        <KeyValues>
+                            <KeyValue key="scrollBarHideIfUnscrollable" value="true" type="string"/>
+                        </KeyValues>
                         <Anchors>
                             <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="5" y="-5"/>
-                            <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-5" y="5"/>
+                            <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-3" y="5"/>
                         </Anchors>
-						<Scripts>
-                            <OnEscapePressed method="OnEscapePressed"/>
-                            <OnMouseUp method="OnMouseUp"/>
-                            <OnChar method="OnChar"/>
-						</Scripts>
-						<FontString inherits="ChatFontSmall"/>
-					</EditBox>
+                        <ScrollChild>
+                            <EditBox parentKey="Text" multiLine="true" mixin="DBH_CommandInputBoxMixin" >
+                                <Size x="280" y="1"/>
+                                <Anchors>
+                                    <Anchor point="TOPLEFT"/>
+                                </Anchors>
+                                <Scripts>
+                                    <OnLoad function="ScrollingEdit_OnLoad"/>
+                                    <OnCursorChanged function="ScrollingEdit_OnCursorChanged"/>
+                                    <OnEscapePressed method="OnEscapePressed"/>
+                                    <OnMouseUp method="OnMouseUp"/>
+                                    <OnChar method="OnChar"/>
+                                </Scripts>
+                                <FontString inherits="ChatFontSmall"/>
+                            </EditBox>
+                        </ScrollChild>
+                    </ScrollFrame>
                 </Frames>
                 <Scripts>
                     <OnLoad inherit="append">
-                        self:GetParent().MultiLineInputBox = self.Text
+                        self:GetParent().MultiLineInputBox = self.ScrollFrame.Text
                     </OnLoad>
                 </Scripts>
 			</Frame>
