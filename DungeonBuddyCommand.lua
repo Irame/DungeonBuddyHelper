@@ -100,6 +100,9 @@ end
 
 --- Generates a text to mention the missing roles in a Discord message
 --- eg. @Tank-M12-14, 2 @DPS-M12-14 or @Tank-M15+, @Healer-M15+, @DPS-M15+
+---@param keyInfo KeystoneInfo
+---@param missingRoles string
+---@return string
 local function GenerateDiscordRolesText(keyInfo, missingRoles)
     local levelRange
     if keyInfo.level >= 15 then
@@ -133,7 +136,9 @@ local function GenerateDiscordRolesText(keyInfo, missingRoles)
     return table.concat(mentions, ", ")
 end
 
--- Checks if your party/raid has at least one class (or pet) with a Lust-like ability
+--- Checks if your party/raid has at least one class (or pet) with a Lust-like ability
+---@param ignoreHunters boolean
+---@return boolean
 local function PartyHasBloodlust(ignoreHunters)
     local lustClasses = {
         ["SHAMAN"] = true,
@@ -152,7 +157,9 @@ local function PartyHasBloodlust(ignoreHunters)
     return false
 end
 
--- Checks if your party/raid has at least one combat resurrection provider
+--- Checks if your party/raid has at least one combat resurrection provider
+---@param ignoreHunters boolean
+---@return boolean
 function PartyHasCombatRes(ignoreHunters)
     local brezClasses = {
         ["DRUID"] = true,
@@ -172,6 +179,8 @@ function PartyHasCombatRes(ignoreHunters)
     return false
 end
 
+---@param keyInfo KeystoneInfo
+---@return string
 local function GenerateSpecificRequirementsText(keyInfo)
     local cfg = private.db.global.boilerRoom.specificRequirements
 
@@ -196,7 +205,12 @@ local function GenerateSpecificRequirementsText(keyInfo)
     return table.concat(requirements, ", ")
 end
 
-function private:GenerateBoilerRoolText(info, runType, missingRoles)
+---@param info KeystoneInfo
+---@param runType RunType
+---@param missingRoles string
+---@param randomSeed number
+---@return string
+function private:GenerateBoilerRoomText(info, runType, missingRoles, randomSeed)
     local runTypeLong = "TimeButComplete"
     for key, value in pairs(private.Enum.RunType) do
         if value == runType then
@@ -205,9 +219,9 @@ function private:GenerateBoilerRoolText(info, runType, missingRoles)
         end
     end
 
-    local groupPostfix = self:GenerateRandomUppercaseString(3)
+    local groupPostfix = self:GenerateRandomUppercaseString(3, randomSeed)
     local dungeonShorthand = strupper(info.dungeonShorthand)
-    local password = self:GeneratePassphrase(3)
+    local password = self:GeneratePassphrase(3, randomSeed)
     local missingRolesMentions = GenerateDiscordRolesText(info, missingRoles)
     local specificRequirements = GenerateSpecificRequirementsText(info)
 

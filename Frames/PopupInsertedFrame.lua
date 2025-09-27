@@ -143,10 +143,10 @@ end
 ---Update the command
 function DBH_PopupInsertedFrameMixin:UpdateCommand()
     local command = ""
-    if private:IsKeySupportedByDungeonBuddy(self.selectedKeyInfo) or self.selectedRunType == private.Enum.RunType.TimeButComplete then
+    if private:IsKeySupportedByDungeonBuddy(self.selectedKeyInfo) then
         command = private:GenerateDungeonBuddyCommand(self.selectedKeyInfo, self.selectedRunType, self.RoleSelect:GetShortRolesString())
     else
-        command = private:GenerateBoilerRoolText(self.selectedKeyInfo, self.selectedRunType, self.RoleSelect:GetShortRolesString())
+        command = private:GenerateBoilerRoomText(self.selectedKeyInfo, self.selectedRunType, self.RoleSelect:GetShortRolesString(), self.randomSeed)
     end
     self:SetCommand(command)
 end
@@ -183,6 +183,8 @@ end
 function DBH_PopupInsertedFrameMixin:OnShow()
     private.openRaidLib.RegisterCallback(self, "KeystoneUpdate", "OnKeystoneUpdate")
     private.openRaidLib:RequestKeystoneDataFromParty()
+
+    self.randomSeed = math.random(1, 1000000)
 
     self:UpdateRoleSelect()
 
