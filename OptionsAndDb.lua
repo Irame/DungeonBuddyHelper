@@ -139,13 +139,13 @@ local function GenerateOptions(helpHeader, helpLines)
                                     include = {
                                         type = "toggle",
                                         name = L["Include"],
-                                        desc = L["Include key completion requirement."],
+                                        desc = L["Include a requirement that applicants should have completed the dungeon on a lower level."],
                                         order = 1,
                                     },
                                     keyOffset = {
                                         type = "range",
                                         name = L["Offset"],
-                                        desc = L["Offset used for key completion requirement."],
+                                        desc = L["Offset used for key completion requirement. This is subtracted from the selected key level."],
                                         min = 1, max = 5, step = 1,
                                         order = 2,
                                     },
@@ -160,13 +160,13 @@ local function GenerateOptions(helpHeader, helpLines)
                                     include = {
                                         type = "toggle",
                                         name = L["Include"],
-                                        desc = L["Include Bloodlust requirement."],
+                                        desc = L["Include the Bloodlust requirement if your party doesn't already meet it."],
                                         order = 1,
                                     },
                                     ignoreHunters = {
                                         type = "toggle",
                                         name = L["Ignore Hunters"],
-                                        desc = L["Ignore hunters when checking for Bloodlust."],
+                                        desc = L["Ignore hunters when checking for Bloodlust in your party."],
                                         order = 2,
                                     },
                                 },
@@ -180,13 +180,13 @@ local function GenerateOptions(helpHeader, helpLines)
                                     include = {
                                         type = "toggle",
                                         name = L["Include"],
-                                        desc = L["Include Combat Res requirement."],
+                                        desc = L["Include the Combat Res requirement if your party doesn't already meet it."],
                                         order = 1,
                                     },
                                     ignoreHunters = {
                                         type = "toggle",
                                         name = L["Ignore Hunters"],
-                                        desc = L["Ignore hunters when checking for Combat Res."],
+                                        desc = L["Ignore hunters when checking for Combat Res in your party."],
                                         order = 2,
                                     },
                                 },
