@@ -121,8 +121,11 @@ local function GenerateDiscordRolesText(keyInfo, missingRoles)
         end
     end
 
+    local roleOrder = { "t", "h", "d" }
+
     local mentions = {}
-    for role, count in pairs(roleCounts) do
+    for _, role in ipairs(roleOrder) do
+        local count = roleCounts[role]
         if count > 0 then
             local roleName = (role == "t" and "Tank") or (role == "h" and "Healer") or (role == "d" and "DPS")
             if count > 1 then
