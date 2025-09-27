@@ -20,7 +20,7 @@
                     <Anchor point="TOPRIGHT" relativeKey="$parent.RunTypeDropdown" relativePoint="BOTTOMRIGHT" x="0" y="-10"/>
                 </Anchors>
             </Frame>
-            <EditBox inherits="InputBoxTemplate" parentKey="InputBox" mixin="DBH_CommandInputBoxMixin">
+            <EditBox parentKey="SingleLineInputBox" inherits="InputBoxTemplate" mixin="DBH_CommandInputBoxMixin">
                 <Size y="20"/>
                 <Anchors>
                     <Anchor point="BOTTOMLEFT" x="5"/>
@@ -31,7 +31,34 @@
                     <OnMouseUp method="OnMouseUp"/>
                     <OnChar method="OnChar"/>
                 </Scripts>
+                <FontString inherits="ChatFontNormal"/>
             </EditBox>
+			<Frame parentKey="MultiLineInput" inherits="TooltipBackdropTemplate">
+				<Size y="95"/>
+                <Anchors>
+                    <Anchor point="BOTTOMLEFT"/>
+                    <Anchor point="BOTTOMRIGHT"/>
+                </Anchors>
+                <Frames>
+                    <EditBox parentKey="Text" multiLine="true" mixin="DBH_CommandInputBoxMixin" >
+                        <Anchors>
+                            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="5" y="-5"/>
+                            <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-5" y="5"/>
+                        </Anchors>
+						<Scripts>
+                            <OnEscapePressed method="OnEscapePressed"/>
+                            <OnMouseUp method="OnMouseUp"/>
+                            <OnChar method="OnChar"/>
+						</Scripts>
+						<FontString inherits="ChatFontSmall"/>
+					</EditBox>
+                </Frames>
+                <Scripts>
+                    <OnLoad inherit="append">
+                        self:GetParent().MultiLineInputBox = self.Text
+                    </OnLoad>
+                </Scripts>
+			</Frame>
         </Frames>
         <Layers>
             <Layer>

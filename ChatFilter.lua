@@ -2,7 +2,7 @@
 local private = select(2, ...)
 
 local function PartyChatFilter(self, event, msg, sender, ...)
-    if private.db.global.chatKeyLinks then
+    if private.db.global.general.chatKeyLinks then
         local mythicKeyData = msg:match("|Hkeystone:([^|]+)|h")
         if mythicKeyData then
             local clickableLink = "|HDungeonBuddyHelper:" .. mythicKeyData .. "|h|cfffce303[LFG NoP]|r|h"

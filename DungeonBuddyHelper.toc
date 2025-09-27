@@ -16,9 +16,11 @@ Frames/RoleSelect.xml
 Frames/PopupInsertedFrame.xml
 Frames/LFGFrameButton.xml
 
+WowWords.lua
 Utils.lua
 LFGFrameUtils.lua
 KeystoneParsing.lua
 DungeonBuddyCommand.lua
 ChatFilter.lua
+OptionsAndDb.lua
 Main.lua

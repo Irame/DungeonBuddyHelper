@@ -94,8 +94,136 @@ private.Enum.RunType = {
 ---@param info KeystoneInfo The info of the keystone
 ---@param runType RunType The type of the run
 ---@param missingRoles string The roles that are missing to form a dungeon group
-function private:GenerateCommand(info, runType, missingRoles)
+function private:GenerateDungeonBuddyCommand(info, runType, missingRoles)
     return string.format("/lfgquick quick_dungeon_string:%s %d%s %s %s", info.dungeonShorthand, info.level, runType, private:GetPlayerRole(), missingRoles)
+end
+
+--- Generates a text to mention the missing roles in a Discord message
+--- eg. @Tank-M12-14, 2 @DPS-M12-14 or @Tank-M15+, @Healer-M15+, @DPS-M15+
+local function GenerateDiscordRolesText(keyInfo, missingRoles)
+    local levelRange
+    if keyInfo.level >= 15 then
+        levelRange = "15+"
+    elseif keyInfo.level >= 12 then
+        levelRange = "12-14"
+    else
+        return ""
+    end
+
+    local roleCounts = { t = 0, h = 0, d = 0 }
+    for i = 1, #missingRoles do
+        local role = missingRoles:sub(i, i)
+        if roleCounts[role] then
+            roleCounts[role] = roleCounts[role] + 1
+        end
+    end
+
+    local mentions = {}
+    for role, count in pairs(roleCounts) do
+        if count > 0 then
+            local roleName = (role == "t" and "Tank") or (role == "h" and "Healer") or (role == "d" and "DPS")
+            if count > 1 then
+                table.insert(mentions, string.format("%d @%s-M%s", count, roleName, levelRange))
+            else
+                table.insert(mentions, string.format("@%s-M%s", roleName, levelRange))
+            end
+        end
+    end
+
+    return table.concat(mentions, ", ")
+end
+
+-- Checks if your party/raid has at least one class (or pet) with a Lust-like ability
+local function PartyHasBloodlust(ignoreHunters)
+    local lustClasses = {
+        ["SHAMAN"] = true,
+        ["MAGE"] = true,
+        ["EVOKER"] = true,
+        ["HUNTER"] = not ignoreHunters,
+    }
+
+    for unit in private:IterPartyMembers() do
+        local _, class = UnitClass(unit)
+        if lustClasses[class] then
+            return true
+        end
+    end
+
+    return false
+end
+
+-- Checks if your party/raid has at least one combat resurrection provider
+function PartyHasCombatRes(ignoreHunters)
+    local brezClasses = {
+        ["DRUID"] = true,
+        ["WARLOCK"] = true,
+        ["DEATHKNIGHT"] = true,
+        ["PALADIN"] = true,
+        ["HUNTER"] = not ignoreHunters,
+    }
+
+    for unit in private:IterPartyMembers() do
+        local _, class = UnitClass(unit)
+        if brezClasses[class] then
+            return true
+        end
+    end
+
+    return false
+end
+
+local function GenerateSpecificRequirementsText(keyInfo)
+    local cfg = private.db.global.boilerRoom.specificRequirements
+
+    if not cfg.enabled then
+        return ""
+    end
+
+    local requirements = {}
+
+    if cfg.bloodlust.include and not PartyHasBloodlust(cfg.bloodlust.ignoreHunters) then
+        table.insert(requirements, "Need BL")
+    end
+
+    if cfg.combatRes.include and not PartyHasCombatRes(cfg.combatRes.ignoreHunters) then
+        table.insert(requirements, "Need CR")
+    end
+
+    if cfg.keyCompletion.include then
+        table.insert(requirements, ("Have it timed on +%d"):format(keyInfo.level - cfg.keyCompletion.keyOffset))
+    end
+
+    return table.concat(requirements, ", ")
+end
+
+function private:GenerateBoilerRoolText(info, runType, missingRoles)
+    local runTypeLong = "TimeButComplete"
+    for key, value in pairs(private.Enum.RunType) do
+        if value == runType then
+            runTypeLong = key
+            break
+        end
+    end
+
+    local groupPostfix = self:GenerateRandomUppercaseString(3)
+    local dungeonShorthand = strupper(info.dungeonShorthand)
+    local password = self:GeneratePassphrase(3)
+    local missingRolesMentions = GenerateDiscordRolesText(info, missingRoles)
+    local specificRequirements = GenerateSpecificRequirementsText(info)
+
+    return string.format([[
+- `Group Name:` NOP %s %s
+- `Dungeon & difficulty:` %s +%d
+- `Timing expectations:` %s
+- `Looking for:` %s
+- `Specific Requirements:` %s
+- `Password:` %s]],
+        dungeonShorthand, groupPostfix,
+        dungeonShorthand, info.level,
+        runTypeLong,
+        missingRolesMentions,
+        specificRequirements,
+        password)
 end
 
 private.Enum.OpenLfgFrame = {
@@ -119,7 +247,7 @@ function private:ShowDungeonBuddyCommandToPlayer(info)
         OnShow = function(this, ...)
             this.insertedFrame.OnChanged = function(keyInfo, runType)
                 this.data = keyInfo
-                if private.db.global.openLfgFrame == private.Enum.OpenLfgFrame.OnDialog then
+                if private.db.global.general.openLfgFrame == private.Enum.OpenLfgFrame.OnDialog then
                     private:ShowLFGFrameWithEntryCreationForActivity(keyInfo, runType)
                 end
 
@@ -137,7 +265,7 @@ function private:ShowDungeonBuddyCommandToPlayer(info)
             this.insertedFrame:Hide();
         end,
         OnAccept = function(this, ...)
-            if private.db.global.openLfgFrame == private.Enum.OpenLfgFrame.OnOkay then
+            if private.db.global.general.openLfgFrame == private.Enum.OpenLfgFrame.OnOkay then
                 private:ShowLFGFrameWithEntryCreationForActivity(this.data, this.insertedFrame:IsCompletionChecked())
             end
             if LFGListFrame.EntryCreation.Name:IsVisible() and this.data then

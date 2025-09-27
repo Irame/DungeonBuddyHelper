@@ -7,8 +7,7 @@ local L = private.L
 DBH_CommandInputBoxMixin = {}
 
 function DBH_CommandInputBoxMixin:OnEscapePressed()
-    -- hide the static popup
-    self:GetParent():GetParent():Hide();
+    StaticPopup_Hide("SHOW_DB_COMMAND")
 end
 
 function DBH_CommandInputBoxMixin:OnMouseUp()
@@ -31,7 +30,9 @@ end
 ---@field RunTypeDropdown WowStyle1DropdownTemplate
 ---@field KeySelectDropdown WowStyle1DropdownTemplate
 ---@field RoleSelect DBH_RoleSelect
----@field InputBox DBH_CommandInputBox
+---@field SingleLineInputBox DBH_CommandInputBox
+---@field MultiLineInput Frame
+---@field MultiLineInputBox DBH_CommandInputBox
 ---@field OnChanged fun(keyInfo: UnitKeystoneInfo|KeystoneInfo, runType: RunType)
 DBH_PopupInsertedFrameMixin = {}
 
@@ -124,13 +125,30 @@ function DBH_PopupInsertedFrameMixin:InvokeOnChanged()
     self:UpdateCommand()
 end
 
+function DBH_PopupInsertedFrameMixin:SetCommand(command)
+    if command:find("\n") then
+        self.MultiLineInput:Show()
+        self.SingleLineInputBox:Hide()
+        self:SetHeight(210)
+        self.MultiLineInputBox:SetCommand(command)
+    else
+        self.MultiLineInput:Hide()
+        self.SingleLineInputBox:Show()
+        self:SetHeight(135)
+        self.SingleLineInputBox:SetCommand(command)
+    end
+    StaticPopup_ResizeShownDialogs()
+end
+
 ---Update the command
 function DBH_PopupInsertedFrameMixin:UpdateCommand()
     local command = ""
-    if private:IsKeySupportedByDungeonBuddy(self.selectedKeyInfo) then
-        command = private:GenerateCommand(self.selectedKeyInfo, self.selectedRunType, self.RoleSelect:GetShortRolesString())
+    if private:IsKeySupportedByDungeonBuddy(self.selectedKeyInfo) or self.selectedRunType == private.Enum.RunType.TimeButComplete then
+        command = private:GenerateDungeonBuddyCommand(self.selectedKeyInfo, self.selectedRunType, self.RoleSelect:GetShortRolesString())
+    else
+        command = private:GenerateBoilerRoolText(self.selectedKeyInfo, self.selectedRunType, self.RoleSelect:GetShortRolesString())
     end
-    self.InputBox:SetCommand(command)
+    self:SetCommand(command)
 end
 
 ---Initialize the popup inserted frame

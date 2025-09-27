@@ -21,84 +21,15 @@ local helpLines = {
     "|cfff4d512/dbh <keystoneLink>|r - " .. L["Shows the Dungeon Buddy command for the given keystone."],
 }
 
-function addon:GenerateOptions()
-    local helpDesc = helpHeader
-    for i, line in ipairs(helpLines) do
-        helpDesc = helpDesc .. "\n" .. line
-    end
-
-    ---@type AceConfig.OptionsTable
-    local options = {
-        type = "group",
-        name = L["DungeonBuddy Helper (NoP)"],
-        args = {
-            chatKeyLinks = {
-                type = "toggle",
-                name = L["Chat Key Links"],
-                desc = L["Enable links for DBH behind keystones in chat."],
-                get = function() return private.db.global.chatKeyLinks end,
-                set = function(_, value)
-                    private.db.global.chatKeyLinks = value
-                end,
-                order = 1,
-            },
-            lfgFrameButton = {
-                type = "toggle",
-                name = L["LFG Frame Button"],
-                desc = L["Show the button for DBH inside the LFG frame."],
-                get = function() return private.db.global.lfgFrameButton end,
-                set = function(_, value)
-                    private.db.global.lfgFrameButton = value
-                    if private.lfgFrameButton then
-                        private.lfgFrameButton:SetShown(value)
-                    end
-                end,
-                order = 2,
-            },
-            openLfgFrame = {
-                type = "select",
-                name = L["Open LFG Frame"],
-                desc = L["Select when/if to open the LFG frame."],
-                values = {
-                    [private.Enum.OpenLfgFrame.OnDialog] = L["On Dialog"],
-                    [private.Enum.OpenLfgFrame.OnOkay] = L["On Okay"],
-                    [private.Enum.OpenLfgFrame.Never] = L["Never"],
-                },
-                get = function() return private.db.global.openLfgFrame end,
-                set = function(_, value)
-                    private.db.global.openLfgFrame = value
-                end,
-                order = 3,
-            },
-            commandHelp = {
-                type = "description",
-                name = helpDesc,
-                fontSize = "medium",
-                order = 4,
-            },
-        },
-    }
-
-    return options
-end
-
 function addon:OnInitialize()
-    private.db = LibStub("AceDB-3.0"):New("DungeonBuddyHelperDB", {
-        global = {
-            chatKeyLinks = true,
-            lfgFrameButton = true,
-            openLfgFrame = private.Enum.OpenLfgFrame.OnDialog,
-        },
-    }, true)
-
-    LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, self:GenerateOptions())
-    self.optionsFrame, self.optionsFrameId = LibStub("AceConfigDialog-3.0"):AddToBlizOptions(addonName, "DungeonBuddy Helper (NoP)")
+    private:InitializeDb()
+    self.optionsFrame, self.optionsFrameId = private:InitializeOptions(helpHeader, helpLines)
 
     self:RegisterChatCommand("dbh", "ChatCommandHandler");
     self:RegisterChatCommand("lfg", "ChatCommandHandler");
 
     private.lfgFrameButton = CreateFrame("Button", "DBH_LFGFrameButton", LFGListFrame.CategorySelection, "DBH_LFGFrameButtonTemplate")
-    private.lfgFrameButton:SetShown(private.db.global.lfgFrameButton)
+    private.lfgFrameButton:SetShown(private.db.global.general.lfgFrameButton)
 
     private:InitChatLinks()
 
