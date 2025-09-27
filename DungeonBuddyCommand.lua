@@ -70,8 +70,12 @@ local function KeyLevelToDiscordChannel(level)
         return "lfg-m4-m6"
     elseif level <= 9 then
         return "lfg-m7-m9"
-    else
+    elseif level <= 11 then
         return "lfg-m10-m11"
+    elseif level <= 14 then
+        return "lfg-m12-m14"
+    else
+        return "lfg-m15-and-up"
     end
 end
 
@@ -256,10 +260,12 @@ function private:ShowDungeonBuddyCommandToPlayer(info)
     local insertedFrame = _G["DBH_PopupInsertedFrame"]
     insertedFrame:Show();
 
-    local popupTextTemplate = L["Select key and playstyle and copy'n'paste the command in the '%s' NoP discord channel."]
-    local notSupportedKeyLevelText = L["The DungeonBuddy bot only supports dungeons below level 12. Please use the 'Boiler Room' to look for people manually."]
+    local dungeonBuddyTextTemplate = L["Select key and playstyle and copy'n'paste the command in the '%s' NoP discord channel."]
+    local boilerRoomTextTemplate = "|cffff3636" .. L["The DungeonBuddy bot only supports dungeons below level 12."] .. "|r\n"
+        .. L["Please use the chat message below to look for people manually in the 'Boiler Room' channel %s."]
+
     StaticPopupDialogs["SHOW_DB_COMMAND"] = StaticPopupDialogs["SHOW_DB_COMMAND"] or {
-        text = popupTextTemplate,
+        text = dungeonBuddyTextTemplate,
         button1 = OKAY,
         OnShow = function(this, ...)
             this.insertedFrame.OnChanged = function(keyInfo, runType)
@@ -268,11 +274,8 @@ function private:ShowDungeonBuddyCommandToPlayer(info)
                     private:ShowLFGFrameWithEntryCreationForActivity(keyInfo, runType)
                 end
 
-                if private:IsKeySupportedByDungeonBuddy(keyInfo) then
-                    this:GetTextFontString():SetFormattedText(popupTextTemplate, KeyLevelToDiscordChannel(keyInfo.level))
-                else
-                    this:GetTextFontString():SetText("|cffff3636" .. notSupportedKeyLevelText .. "|r")
-                end
+                local textTemplate = private:IsKeySupportedByDungeonBuddy(keyInfo) and dungeonBuddyTextTemplate or boilerRoomTextTemplate
+                this:GetTextFontString():SetFormattedText(textTemplate, KeyLevelToDiscordChannel(keyInfo.level))
             end
 
             this.insertedFrame:Initialize(this.data)
