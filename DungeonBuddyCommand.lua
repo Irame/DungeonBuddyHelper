@@ -212,20 +212,19 @@ local function GenerateSpecificRequirementsText(keyInfo)
     return table.concat(requirements, ", ")
 end
 
+local discordRunTypeNames = {
+    [private.Enum.RunType.TimeButComplete] = "Time but complete",
+    [private.Enum.RunType.TimeOrAbandon] = "Time or abandon",
+    [private.Enum.RunType.VaultCompletion] = "Vault completion",
+}
+
 ---@param info KeystoneInfo
 ---@param runType RunType
 ---@param missingRoles string
 ---@param randomSeed number
 ---@return string
 function private:GenerateBoilerRoomText(info, runType, missingRoles, randomSeed)
-    local runTypeLong = "TimeButComplete"
-    for key, value in pairs(private.Enum.RunType) do
-        if value == runType then
-            runTypeLong = key
-            break
-        end
-    end
-
+    local runTypeText = discordRunTypeNames[runType] or discordRunTypeNames[private.Enum.RunType.TimeButComplete]
     local groupPostfix = self:GenerateRandomUppercaseString(3, randomSeed)
     local dungeonShorthand = strupper(info.dungeonShorthand)
     local password = self:GeneratePassphrase(3, randomSeed)
@@ -241,7 +240,7 @@ function private:GenerateBoilerRoomText(info, runType, missingRoles, randomSeed)
 - `Password:` %s]],
         dungeonShorthand, groupPostfix,
         dungeonShorthand, info.level,
-        runTypeLong,
+        runTypeText,
         missingRolesMentions,
         specificRequirements,
         password)
