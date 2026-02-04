@@ -60,33 +60,49 @@ function private:GetMissingRoles()
     return table.concat(missingRoles, "")
 end
 
----Returns the No Pressure Discord channel apropriate for the key level
+local KeyLevelPartitions = {3, 6, 9, 11, 13}
+local DungeonBuddyMaxKeyLevel = 13
+
+---@class NopKeyLevelInfo
+---@field minLevel integer
+---@field maxLevel? integer
+---@field supportedByDungeonBuddy boolean
+
+---Returns information about the No Pressure Discord key level categories
 ---@param level integer
----@return string
-local function KeyLevelToDiscordChannel(level)
-    if level <= 3 then
-        return "lfg-m2-m3"
-    elseif level <= 6 then
-        return "lfg-m4-m6"
-    elseif level <= 9 then
-        return "lfg-m7-m9"
-    elseif level <= 11 then
-        return "lfg-m10-m11"
-    elseif level <= 14 then
-        return "lfg-m12-m14"
-    else
-        return "lfg-m15-and-up"
+---@return NopKeyLevelInfo
+local function GetNopKeyLevelInfo(level)
+    for i, maxLevel in ipairs(KeyLevelPartitions) do
+        if level <= maxLevel then
+            return {
+                minLevel = (i == 1) and 2 or (KeyLevelPartitions[i - 1] + 1),
+                maxLevel = maxLevel,
+                supportedByDungeonBuddy = level <= DungeonBuddyMaxKeyLevel,
+            }
+        end
     end
+
+    return {
+        minLevel = KeyLevelPartitions[#KeyLevelPartitions] + 1,
+        supportedByDungeonBuddy = false,
+    }
 end
 
-local function NOP() end
-
-local DUNGEON_BUDDY_MAX_KEY_LEVEL = 13
+---Returns the No Pressure Discord channel apropriate for the key level
+---@param levelInfo NopKeyLevelInfo
+---@return string
+local function KeyLevelInfoToDiscordChannel(levelInfo)
+    if levelInfo.maxLevel then
+        return ("lfg-m%d-m%d"):format(levelInfo.minLevel, levelInfo.maxLevel)
+    else
+        return ("lfg-m%d-and-up"):format(levelInfo.minLevel)
+    end
+end
 
 ---Checks if the key level is supported by the DungeonBuddy bot
 ---@param keyInfo KeystoneInfo The info of the keystone
 function private:IsKeySupportedByDungeonBuddy(keyInfo)
-    return keyInfo and keyInfo.level <= DUNGEON_BUDDY_MAX_KEY_LEVEL
+    return keyInfo and keyInfo.level <= DungeonBuddyMaxKeyLevel
 end
 
 ---@enum RunType
@@ -110,13 +126,12 @@ end
 ---@param missingRoles string
 ---@return string
 local function GenerateDiscordRolesText(keyInfo, missingRoles)
+    local keyLevelInfo = GetNopKeyLevelInfo(keyInfo.level)
     local levelRange
-    if keyInfo.level >= 15 then
-        levelRange = "15+"
-    elseif keyInfo.level >= 12 then
-        levelRange = "12-14"
+    if keyLevelInfo.maxLevel then
+        levelRange = string.format("%d-%d", keyLevelInfo.minLevel, keyLevelInfo.maxLevel)
     else
-        return ""
+        levelRange = string.format("%d+", keyLevelInfo.minLevel)
     end
 
     local roleCounts = { t = 0, h = 0, d = 0 }
@@ -276,10 +291,11 @@ function private:ShowDungeonBuddyCommandToPlayer(info)
                 end
 
                 local text = this:GetTextFontString()
-                if private:IsKeySupportedByDungeonBuddy(keyInfo) then
-                    text:SetFormattedText(dungeonBuddyTextTemplate, KeyLevelToDiscordChannel(keyInfo.level))
+                local nopKeyLevelInfo = GetNopKeyLevelInfo(keyInfo.level)
+                if nopKeyLevelInfo.supportedByDungeonBuddy then
+                    text:SetFormattedText(dungeonBuddyTextTemplate, KeyLevelInfoToDiscordChannel(nopKeyLevelInfo))
                 else
-                    text:SetFormattedText(boilerRoomTextTemplate, DUNGEON_BUDDY_MAX_KEY_LEVEL+1, KeyLevelToDiscordChannel(keyInfo.level))
+                    text:SetFormattedText(boilerRoomTextTemplate, DungeonBuddyMaxKeyLevel+1, KeyLevelInfoToDiscordChannel(nopKeyLevelInfo))
                 end
             end
 
@@ -313,5 +329,5 @@ function private:ShowDungeonBuddyCommandToPlayer(info)
         editBoxWidth = 285,
     }
 
-    StaticPopup_Show("SHOW_DB_COMMAND", KeyLevelToDiscordChannel(info.level), nil, info, insertedFrame)
+    StaticPopup_Show("SHOW_DB_COMMAND", KeyLevelInfoToDiscordChannel(GetNopKeyLevelInfo(info.level)), nil, info, insertedFrame)
 end
