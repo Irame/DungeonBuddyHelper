@@ -15,8 +15,10 @@ function DBH_CommandInputBoxMixin:OnMouseUp()
 end
 
 function DBH_CommandInputBoxMixin:OnChar()
-    self:SetText(self.command);
-    self:HighlightText();
+    if self.command then
+        self:SetText(self.command);
+        self:HighlightText();
+    end;
 end
 
 function DBH_CommandInputBoxMixin:SetCommand(command)
