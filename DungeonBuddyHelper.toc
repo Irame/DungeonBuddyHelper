@@ -1,4 +1,4 @@
-## Interface: 110200
+## Interface: 120000
 ## Title: DungeonBuddy Helper
 ## Notes: A helper addon for the DungeonBuddy Bot form the 'No Pressure' Discord server
 ## Version: @project-version@
