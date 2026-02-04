@@ -81,10 +81,12 @@ end
 
 local function NOP() end
 
+local DUNGEON_BUDDY_MAX_KEY_LEVEL = 13
+
 ---Checks if the key level is supported by the DungeonBuddy bot
 ---@param keyInfo KeystoneInfo The info of the keystone
 function private:IsKeySupportedByDungeonBuddy(keyInfo)
-    return keyInfo and keyInfo.level < 12
+    return keyInfo and keyInfo.level <= DUNGEON_BUDDY_MAX_KEY_LEVEL
 end
 
 ---@enum RunType
@@ -260,7 +262,7 @@ function private:ShowDungeonBuddyCommandToPlayer(info)
     insertedFrame:Show();
 
     local dungeonBuddyTextTemplate = L["Select key and playstyle and copy'n'paste the command in the '%s' NoP discord channel."]
-    local boilerRoomTextTemplate = "|cffff3636" .. L["The DungeonBuddy bot only supports dungeons below level 12."] .. "|r\n"
+    local boilerRoomTextTemplate = "|cffff3636" .. L["The DungeonBuddy bot only supports dungeons below level %d."] .. "|r\n"
         .. L["Please use the chat message below to look for people manually in the 'Boiler Room' channel %s."]
 
     StaticPopupDialogs["SHOW_DB_COMMAND"] = StaticPopupDialogs["SHOW_DB_COMMAND"] or {
@@ -273,8 +275,12 @@ function private:ShowDungeonBuddyCommandToPlayer(info)
                     private:ShowLFGFrameWithEntryCreationForActivity(keyInfo, runType)
                 end
 
-                local textTemplate = private:IsKeySupportedByDungeonBuddy(keyInfo) and dungeonBuddyTextTemplate or boilerRoomTextTemplate
-                this:GetTextFontString():SetFormattedText(textTemplate, KeyLevelToDiscordChannel(keyInfo.level))
+                local text = this:GetTextFontString()
+                if private:IsKeySupportedByDungeonBuddy(keyInfo) then
+                    text:SetFormattedText(dungeonBuddyTextTemplate, KeyLevelToDiscordChannel(keyInfo.level))
+                else
+                    text:SetFormattedText(boilerRoomTextTemplate, DUNGEON_BUDDY_MAX_KEY_LEVEL+1, KeyLevelToDiscordChannel(keyInfo.level))
+                end
             end
 
             this.insertedFrame:Initialize(this.data)
