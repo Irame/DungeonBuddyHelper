@@ -1,1 +1,0 @@
-- Added support for keys with level 12 or higher by providing a boiler room channel message
