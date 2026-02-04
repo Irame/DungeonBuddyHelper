@@ -5,14 +5,19 @@ local private = select(2, ...)
 -- in the call stack from LFGListEntryCreation_Show down to C_LFGList.SetEntryTitle()
 -- to be able to remove it and to pass down a custom dungeonId
 
-local function LFGListEntryCreation_OnPlayStyleSelected(self, playstyle)
-	--LFGListEntryCreation_OnPlayStyleSelectedInternal(self, playstyle); -- this contains the call to C_LFGList.SetEntryTitle()
-	self.selectedPlaystyle = playstyle; -- added to mimic the behavior of LFGListEntryCreation_OnPlayStyleSelectedInternal
-	self.PlayStyleDropdown:GenerateMenu();
+function LFGListEntryCreation_OnPlayStyleSelectedInternal(self, generalPlaystyle)
+	-- local previousPlaystyle = self.generalPlaystyle;
+	self.generalPlaystyle = generalPlaystyle;
+	-- local legacyLFGEntryPlaystyle = Enum.LFGEntryPlaystyle.None;
+	-- if(C_LFGList.DoesEntryTitleMatchPrebuiltTitle(self.selectedActivity, self.selectedGroup, legacyLFGEntryPlaystyle, previousPlaystyle)) then
+	-- 	LFGListEntryCreation_SetTitleFromActivityInfo(self);  // prevent call of protected C_LFGList.SetEntryTitle()
+	-- end
+
+	LFGListEntryCreation_UpdateValidState(self);
 end
 
 local function LFGListEntryCreation_Select(self, filters, categoryID, groupID, activityID)
-    filters, categoryID, groupID, activityID = LFGListUtil_AugmentWithBest(bit.bor(self.baseFilters or 0, filters or 0), categoryID, groupID, activityID);
+	filters, categoryID, groupID, activityID = LFGListUtil_AugmentWithBest(bit.bor(self.baseFilters or 0, filters or 0), categoryID, groupID, activityID);
 	self.selectedCategory = categoryID;
 	self.selectedGroup = groupID;
 	self.selectedActivity = activityID;
@@ -38,19 +43,9 @@ local function LFGListEntryCreation_Select(self, filters, categoryID, groupID, a
 	self.GroupDropdown:SetShown(not categoryInfo.autoChooseActivity);
 	self.GroupDropdown:GenerateMenu();
 
-	local shouldShowPlayStyleDropdown = (categoryInfo.showPlaystyleDropdown) and (activityInfo.isMythicPlusActivity or activityInfo.isRatedPvpActivity or activityInfo.isCurrentRaidActivity or activityInfo.isMythicActivity);
 	local shouldShowCrossFactionToggle = (categoryInfo.allowCrossFaction);
 	local shouldDisableCrossFactionToggle = (categoryInfo.allowCrossFaction) and not (activityInfo.allowCrossFaction);
-	if(shouldShowPlayStyleDropdown) then
-		LFGListEntryCreation_OnPlayStyleSelected(self, self.selectedPlaystyle or Enum.LFGEntryPlaystyle.Standard);
-	end
 
-	self.PlayStyleDropdown:SetShown(shouldShowPlayStyleDropdown);
-	self.PlayStyleLabel:SetShown(shouldShowPlayStyleDropdown);
-
-	if(not shouldShowPlayStyleDropdown)  then
-		self.selectedPlaystyle = nil
-	end
 	local _, localizedFaction = UnitFactionGroup("player");
 	self.CrossFactionGroup.Label:SetText(LFG_LIST_CROSS_FACTION:format(localizedFaction));
 	self.CrossFactionGroup.tooltip = LFG_LIST_CROSS_FACTION_TOOLTIP:format(localizedFaction);
@@ -93,12 +88,9 @@ local function LFGListEntryCreation_Select(self, filters, categoryID, groupID, a
 	elseif (self.PVPRating:IsShown()) then
 		self.ItemLevel:SetPoint("TOPLEFT", self.PVPRating, "BOTTOMLEFT", 0, -3);
 		self.PvpItemLevel:SetPoint("TOPLEFT", self.PVPRating, "BOTTOMLEFT", 0, -3);
-	elseif(self.PlayStyleDropdown:IsShown()) then
-		self.ItemLevel:SetPoint("TOPLEFT", self.PlayStyleLabel, "BOTTOMLEFT", -1, -15);
-		self.PvpItemLevel:SetPoint("TOPLEFT", self.PlayStyleLabel, "BOTTOMLEFT", -1, -15);
 	else
-		self.ItemLevel:SetPoint("TOPLEFT", self.Description, "BOTTOMLEFT", -6, -19);
-		self.PvpItemLevel:SetPoint("TOPLEFT", self.Description, "BOTTOMLEFT", -6, -19);
+		self.ItemLevel:SetPoint("TOPLEFT", self.PlayStyleDropdown, "BOTTOMLEFT", -1, -15);
+		self.PvpItemLevel:SetPoint("TOPLEFT", self.PlayStyleDropdown, "BOTTOMLEFT", -1, -15);
 	end
 	if(self.ItemLevel:IsShown()) then
 		LFGListRequirement_Validate(self.ItemLevel, self.ItemLevel.EditBox:GetText());
@@ -106,14 +98,13 @@ local function LFGListEntryCreation_Select(self, filters, categoryID, groupID, a
 		LFGListRequirement_Validate(self.PvpItemLevel, self.PvpItemLevel.EditBox:GetText());
 	end
 
-	LFGListEntryCreation_SetPlaystyleLabelTextFromActivityInfo(self, activityInfo);
 	LFGListEntryCreation_UpdateValidState(self);
-	--LFGListEntryCreation_SetTitleFromActivityInfo(self);  -- this contains the call to C_LFGList.SetEntryTitle()
+	-- LFGListEntryCreation_SetTitleFromActivityInfo(self);  -- this contains the call to C_LFGList.SetEntryTitle()
 end
 
-local function LFGListEntryCreation_SetEditMode(self, activityID)
-	local activeEntryInfo = C_LFGList.GetActiveEntryInfo()
-	self.editMode = activeEntryInfo ~= nil;
+local function LFGListEntryCreation_SetEditMode(self, activityID)  -- changed
+	local activeEntryInfo = C_LFGList.GetActiveEntryInfo()  --added
+	self.editMode = activeEntryInfo ~= nil;  -- changed
 
 	local descInstructions = nil;
 	local isAccountSecured = C_LFGList.IsPlayerAuthenticatedForLFG(self:GetParent().selectedCategory);
@@ -121,7 +112,8 @@ local function LFGListEntryCreation_SetEditMode(self, activityID)
 		descInstructions = LFG_AUTHENTICATOR_DESCRIPTION_BOX;
 	end
 
-	if ( self.editMode ) then
+	if ( self.editMode ) then  -- changed
+		-- local activeEntryInfo = C_LFGList.GetActiveEntryInfo();  -- moved
 		assert(activeEntryInfo);
 
 		--Update the dropdowns
@@ -148,9 +140,7 @@ local function LFGListEntryCreation_SetEditMode(self, activityID)
 		self.PVPRating.EditBox:SetText(activeEntryInfo.requiredPvpRating or "" )
 		self.PrivateGroup.CheckButton:SetChecked(activeEntryInfo.privateGroup);
 		self.CrossFactionGroup.CheckButton:SetChecked(not activeEntryInfo.isCrossFactionListing);
-		if(self.PlayStyleDropdown:IsShown()) then
-			LFGListEntryCreation_OnPlayStyleSelected(self, activeEntryInfo.playstyle);
-		end
+		LFGListEntryCreation_OnPlayStyleSelectedInternal(self, activeEntryInfo.generalPlaystyle);
 
 		self.ListGroupButton:SetText(DONE_EDITING);
 	else
@@ -159,8 +149,21 @@ local function LFGListEntryCreation_SetEditMode(self, activityID)
 		self.ListGroupButton:SetText(LIST_GROUP);
 		self.Name:SetEnabled(isAccountSecured);
 		self.Description.EditBox.Instructions:SetText(descInstructions or DESCRIPTION_OF_YOUR_GROUP);
+		-- local activityInfo = C_LFGList.GetActivityInfoTable(self.selectedActivity);
 
-		LFGListEntryCreation_Select(self, self.selectedFilters, self.selectedCategory, nil, activityID);
+		-- if(activityInfo and self.selectedCategory == GROUP_FINDER_CATEGORY_ID_DUNGEONS) then
+		-- 	local activityID, groupID = C_LFGList.GetOwnedKeystoneActivityAndGroupAndLevel(); --Prioritize regular keystones
+		-- 	if(activityID) then
+		-- 		LFGListEntryCreation_Select(self, self.selectedFilters, self.selectedCategory, groupID, activityID);
+		-- 	else
+		-- 		activityID, groupID = C_LFGList.GetOwnedKeystoneActivityAndGroupAndLevel(true);  -- Check for a timewalking keystone.
+		-- 		if(activityID) then
+		-- 			LFGListEntryCreation_Select(self, self.selectedFilters, self.selectedCategory, groupID, activityID);
+		-- 		end
+		-- 	end
+		-- end
+
+		LFGListEntryCreation_Select(self, self.selectedFilters, self.selectedCategory, nil, activityID);  -- added
 	end;
 end
 
@@ -168,11 +171,14 @@ local function LFGListEntryCreation_Show(self, baseFilters, selectedCategory, se
 	--If this was what the player selected last time, just leave it filled out with the same info.
 	--Also don't save it for categories that try to set it to the current area.
 	local categoryInfo = C_LFGList.GetLfgCategoryInfo(selectedCategory);
+	-- local keepOldData = not categoryInfo.preferCurrentArea and self.selectedCategory == selectedCategory and baseFilters == self.baseFilters and self.selectedFilters == selectedFilters;
 	LFGListEntryCreation_SetBaseFilters(self, baseFilters);
-	LFGListEntryCreation_Clear(self);
-	LFGListEntryCreation_Select(self, selectedFilters, selectedCategory);
-	LFGListEntryCreation_OnPlayStyleSelected(self, playstyle or Enum.LFGEntryPlaystyle.Standard);
-	LFGListEntryCreation_SetEditMode(self, activityID);
+	-- if ( not keepOldData ) then
+		LFGListEntryCreation_Clear(self);
+		LFGListEntryCreation_Select(self, selectedFilters, selectedCategory);
+	-- end
+	LFGListEntryCreation_OnPlayStyleSelectedInternal(self, playstyle or Enum.LFGEntryPlaystyle.Standard);  -- added
+	LFGListEntryCreation_SetEditMode(self, activityID);  -- changed
 
 	LFGListEntryCreation_UpdateValidState(self);
 
