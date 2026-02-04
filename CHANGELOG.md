@@ -1,0 +1,2 @@
+- added Midnight dungeons (unsure about the shorthands)
+- fixed DungeonBuddy level ranges
