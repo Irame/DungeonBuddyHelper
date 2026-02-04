@@ -11,6 +11,24 @@ local L = private.L
 -- activityId taken from https://wago.tools/db2/GroupFinderActivity
 ---@type table<integer, DungeonInfo>
 local dungeonInfo = {
+    -- Midnight
+    [558] = { -- Magisters Terrace
+        activityId = 1760,
+        dungeonShorthand = "magi",
+    },
+    [560] = { -- Maisara Caverns
+        activityId = 1764,
+        dungeonShorthand = "cavns",
+    },
+    [559] = { -- Nexus Point Xenas
+        activityId = 1768,
+        dungeonShorthand = "xenas",
+    },
+    [557] = { -- Windrunner Spire
+        activityId = 1542,
+        dungeonShorthand = "wind",
+    },
+
     -- The War Within
     [499] = { -- Priory of the Sacred Flame
         activityId = 1281,
@@ -258,8 +276,12 @@ local dungeonInfo = {
         activityId = 180,
         dungeonShorthand = "id",
     },
+    [161] = { -- Skyreach
+        activityId = 182,
+        dungeonShorthand = "sky",
+    },
 
-    -- Other (Mists, Cataclysm, etc.)
+    -- Other (Mists, Cataclysm, WOTLK, etc.)
     [2] = { -- Temple of the Jade Serpent
         activityId = 1192,
         dungeonShorthand = "tjs",
@@ -283,6 +305,10 @@ local dungeonInfo = {
     [507] = { -- Grim Batol
         activityId = 1290,
         dungeonShorthand = "gb",
+    },
+    [556] = { -- Pit of Saron
+        activityId = 1770,
+        dungeonShorthand = "pit",
     },
 }
 
