@@ -14,19 +14,19 @@ local dungeonInfo = {
     -- Midnight
     [558] = { -- Magisters Terrace
         activityId = 1760,
-        dungeonShorthand = "magi",
+        dungeonShorthand = "mag",
     },
     [560] = { -- Maisara Caverns
         activityId = 1764,
-        dungeonShorthand = "cavns",
+        dungeonShorthand = "mai",
     },
     [559] = { -- Nexus Point Xenas
         activityId = 1768,
-        dungeonShorthand = "xenas",
+        dungeonShorthand = "npx",
     },
     [557] = { -- Windrunner Spire
         activityId = 1542,
-        dungeonShorthand = "wind",
+        dungeonShorthand = "wrs",
     },
 
     -- The War Within
@@ -308,7 +308,7 @@ local dungeonInfo = {
     },
     [556] = { -- Pit of Saron
         activityId = 1770,
-        dungeonShorthand = "pit",
+        dungeonShorthand = "pos",
     },
 }
 
