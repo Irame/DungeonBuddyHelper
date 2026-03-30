@@ -1,2 +1,2 @@
-- added Midnight dungeons (unsure about the shorthands)
-- fixed DungeonBuddy level ranges
+- fixed dungeon shorthands for midnight dungeons
+- fixed compatibility with new WoW version
