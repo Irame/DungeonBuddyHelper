@@ -60,7 +60,7 @@ function private:GetMissingRoles()
     return table.concat(missingRoles, "")
 end
 
-local KeyLevelPartitions = {3, 6, 9, 11, 13}
+local KeyLevelPartitions = {3, 6, 9, 11, 13, 16}
 local DungeonBuddyMaxKeyLevel = 13
 
 ---@class NopKeyLevelInfo
