@@ -1,2 +1,7 @@
-- fixed dungeon shorthands for midnight dungeons
-- fixed compatibility with new WoW version
+- added support for new midnight dungeons
+  - Altar of Fangs
+  - Den of Nalorakk
+  - Murder Row
+  - The Blinding Vale
+  - Voidscar Arena
+- added support for the new boiler room channel structure
