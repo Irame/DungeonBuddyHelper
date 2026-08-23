@@ -28,6 +28,26 @@ local dungeonInfo = {
         activityId = 1542,
         dungeonShorthand = "wrs",
     },
+    [588] = { -- Altar of Fangs
+        activityId = 1933,
+        dungeonShorthand = "aof",
+    },
+    [586] = { -- Den of Nalorakk
+        activityId = 1952,
+        dungeonShorthand = "don",
+    },
+    [587] = { -- Murder Row
+        activityId = 1950,
+        dungeonShorthand = "mur",
+    },
+    [584] = { -- The Blinding Vale
+        activityId = 1949,
+        dungeonShorthand = "bli",
+    },
+    [585] = { -- Voidscar Arena
+        activityId = 1951,
+        dungeonShorthand = "voi",
+    },
 
     -- The War Within
     [499] = { -- Priory of the Sacred Flame
