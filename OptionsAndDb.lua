@@ -12,6 +12,7 @@ local function GetDbDefaults()
             general = {
                 chatKeyLinks = true,
                 lfgFrameButton = true,
+                customGroupName = "",
                 openLfgFrame = private.Enum.OpenLfgFrame.OnDialog,
             },
             boilerRoom = {

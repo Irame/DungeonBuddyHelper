@@ -5,7 +5,7 @@ local private = select(2, ...)
 -- in the call stack from LFGListEntryCreation_Show down to C_LFGList.SetEntryTitle()
 -- to be able to remove it and to pass down a custom dungeonId
 
-function LFGListEntryCreation_OnPlayStyleSelectedInternal(self, generalPlaystyle)
+local function LFGListEntryCreation_OnPlayStyleSelectedInternal(self, generalPlaystyle)
 	-- local previousPlaystyle = self.generalPlaystyle;
 	self.generalPlaystyle = generalPlaystyle;
 	-- local legacyLFGEntryPlaystyle = Enum.LFGEntryPlaystyle.None;
@@ -193,6 +193,18 @@ end
 ---@param keyInfo KeystoneInfo
 ---@param runType RunType
 function private:ShowLFGFrameWithEntryCreationForActivity(keyInfo, runType)
+    if not keyInfo then
+        return
+    end
+    if InCombatLockdown() then
+        self.addon:Print(self.L["Cannot open group creation during combat."])
+        return
+    end
+    if IsInRaid(LE_PARTY_CATEGORY_HOME)
+        or (IsInGroup(LE_PARTY_CATEGORY_HOME) and not UnitIsGroupLeader("player", LE_PARTY_CATEGORY_HOME)) then
+        self.addon:Print(self.L["Only the party leader can create a dungeon group."])
+        return
+    end
     HelpTip:Hide(LFGListFrame.EntryCreation.Name)
     PVEFrame_ShowFrame("GroupFinderFrame", "LFGListPVEStub");
 

@@ -116,8 +116,13 @@ private.Enum.RunType = {
 ---@param info KeystoneInfo The info of the keystone
 ---@param runType RunType The type of the run
 ---@param missingRoles string The roles that are missing to form a dungeon group
-function private:GenerateDungeonBuddyCommand(info, runType, missingRoles)
-    return string.format("/lfgquick quick_dungeon_string:%s %d%s %s %s", info.dungeonShorthand, info.level, runType, private:GetPlayerRole(), missingRoles)
+function private:GenerateDungeonBuddyCommand(info, runType, missingRoles, customGroupName)
+    local command = string.format("/lfgquick quick_dungeon_string:%s %d%s %s %s", info.dungeonShorthand, info.level, runType, private:GetPlayerRole(), missingRoles)
+    local groupName = self:NormalizeGroupName(customGroupName)
+    if groupName ~= "" then
+        command = command .. " listed_as:" .. groupName
+    end
+    return command
 end
 
 --- Generates a text to mention the missing roles in a Discord message
@@ -240,22 +245,26 @@ local discordRunTypeNames = {
 ---@param missingRoles string
 ---@param randomSeed number
 ---@return string
-function private:GenerateBoilerRoomText(info, runType, missingRoles, randomSeed)
+function private:GenerateBoilerRoomText(info, runType, missingRoles, randomSeed, customGroupName)
     local runTypeText = discordRunTypeNames[runType] or discordRunTypeNames[private.Enum.RunType.TimeButComplete]
     local groupPostfix = self:GenerateRandomUppercaseString(3, randomSeed)
     local dungeonShorthand = strupper(info.dungeonShorthand)
+    local groupName = self:NormalizeGroupName(customGroupName)
+    if groupName == "" then
+        groupName = "NOP " .. dungeonShorthand .. " " .. groupPostfix
+    end
     local password = self:GeneratePassphrase(3, randomSeed)
     local missingRolesMentions = GenerateDiscordRolesText(info, missingRoles)
     local specificRequirements = GenerateSpecificRequirementsText(info)
 
     return string.format([[
-- `Group Name:` NOP %s %s
+- `Group Name:` %s
 - `Dungeon & difficulty:` %s +%d
 - `Timing expectations:` %s
 - `Looking for:` %s
 - `Specific Requirements:` %s
 - `Password:` %s]],
-        dungeonShorthand, groupPostfix,
+        groupName,
         dungeonShorthand, info.level,
         runTypeText,
         missingRolesMentions,
@@ -284,9 +293,12 @@ function private:ShowDungeonBuddyCommandToPlayer(info)
         text = dungeonBuddyTextTemplate,
         button1 = OKAY,
         OnShow = function(this, ...)
+            this.runType = nil
             this.insertedFrame.OnChanged = function(keyInfo, runType)
+                local changed = not this.data or this.data.activityId ~= keyInfo.activityId or this.runType ~= runType
                 this.data = keyInfo
-                if private.db.global.general.openLfgFrame == private.Enum.OpenLfgFrame.OnDialog then
+                this.runType = runType
+                if changed and private.db.global.general.openLfgFrame == private.Enum.OpenLfgFrame.OnDialog then
                     private:ShowLFGFrameWithEntryCreationForActivity(keyInfo, runType)
                 end
 
@@ -302,12 +314,23 @@ function private:ShowDungeonBuddyCommandToPlayer(info)
             this.insertedFrame:Initialize(this.data)
         end,
         OnHide = function(this, ...)
-            this.insertedFrame.OnChanged = nil
-            this.insertedFrame:Hide();
+            -- Reusing a StaticPopup hides it and releases insertedFrame before
+            -- calling OnCancel. Keep cleanup here, while the frame is attached.
+            if this.insertedFrame then
+                this.insertedFrame.OnChanged = nil
+                this.insertedFrame:Hide();
+            end
         end,
         OnAccept = function(this, ...)
+            if not this.insertedFrame then
+                return
+            end
+            this.data = this.insertedFrame.selectedKeyInfo
+            if not this.data then
+                return
+            end
             if private.db.global.general.openLfgFrame == private.Enum.OpenLfgFrame.OnOkay then
-                private:ShowLFGFrameWithEntryCreationForActivity(this.data, this.insertedFrame:IsCompletionChecked())
+                private:ShowLFGFrameWithEntryCreationForActivity(this.data, this.insertedFrame.selectedRunType)
             end
             if LFGListFrame.EntryCreation.Name:IsVisible() and this.data then
                 local helpTipInfo = {
@@ -318,10 +341,6 @@ function private:ShowDungeonBuddyCommandToPlayer(info)
 
                 HelpTip:Show(LFGListFrame.EntryCreation.Name, helpTipInfo, LFGListFrame.EntryCreation.Name)
             end
-        end,
-        OnCancel = function(this, ...)
-            this.insertedFrame.OnChanged = nil
-            this.insertedFrame:Hide();
         end,
         timeout = 0,
         whileDead = 1,

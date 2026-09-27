@@ -370,6 +370,7 @@ function private:GetKeystoneInfoForLink(keystoneLink)
         activityId = info.activityId,
         dungeonShorthand = info.dungeonShorthand,
         level = level,
+        challengeMapID = dungeonID,
     }
 end
 
@@ -377,9 +378,22 @@ end
 ---@param unit string The unit to get the keystone info for
 ---@return UnitKeystoneInfo? keyInfo
 function private:GetKeystoneInfoForUnit(unit)
-    local orlKLeyInfo = private.openRaidLib.GetKeystoneInfo(unit)
+    if not UnitExists(unit) then
+        return
+    end
+    local orlKLeyInfo
+    if unit == "player" then
+        orlKLeyInfo = {
+            -- The dungeon table is keyed by ChallengeMode IDs, not instance map IDs.
+            challengeMapID = C_MythicPlus.GetOwnedKeystoneChallengeMapID(),
+            level = C_MythicPlus.GetOwnedKeystoneLevel(),
+        }
+    else
+        orlKLeyInfo = self:GetSharedPartyKey(unit) or private.openRaidLib.GetKeystoneInfo(unit)
+    end
 
-    if not orlKLeyInfo or orlKLeyInfo.challengeMapID == 0 then
+    if not orlKLeyInfo or not orlKLeyInfo.challengeMapID or orlKLeyInfo.challengeMapID == 0
+        or not orlKLeyInfo.level or orlKLeyInfo.level < 2 then
         return
     end
 
@@ -394,5 +408,6 @@ function private:GetKeystoneInfoForUnit(unit)
         dungeonShorthand = info.dungeonShorthand,
         level = orlKLeyInfo.level,
         unit = unit,
+        owner = GetUnitName(unit, true),
     }
 end

@@ -20,7 +20,25 @@
                     <Anchor point="TOPRIGHT" relativeKey="$parent.RunTypeDropdown" relativePoint="BOTTOMRIGHT" x="0" y="-10"/>
                 </Anchors>
             </Frame>
-            <EditBox parentKey="SingleLineInputBox" inherits="InputBoxTemplate" mixin="DBH_CommandInputBoxMixin">
+            <EditBox parentKey="GroupNameInput" inherits="InputBoxTemplate" autoFocus="false">
+                <Size x="280" y="20"/>
+                <Anchors>
+                    <Anchor point="TOPLEFT" x="5" y="-130"/>
+                </Anchors>
+                <Scripts>
+                    <OnEscapePressed>self:ClearFocus()</OnEscapePressed>
+                    <OnEnterPressed>self:ClearFocus()</OnEnterPressed>
+                </Scripts>
+            </EditBox>
+            <Button parentKey="RefreshKeysButton" inherits="UIPanelButtonTemplate">
+                <Size x="290" y="24"/>
+                <Anchors><Anchor point="TOPLEFT" x="0" y="-180"/></Anchors>
+            </Button>
+            <Button parentKey="ChatKeysButton" inherits="UIPanelButtonTemplate">
+                <Size x="290" y="24"/>
+                <Anchors><Anchor point="TOPLEFT" x="0" y="-210"/></Anchors>
+            </Button>
+            <EditBox parentKey="SingleLineInputBox" inherits="InputBoxTemplate" mixin="DBH_CommandInputBoxMixin" autoFocus="false">
                 <Size y="20"/>
                 <Anchors>
                     <Anchor point="BOTTOMLEFT" x="5"/>
@@ -50,7 +68,7 @@
                             <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-3" y="5"/>
                         </Anchors>
                         <ScrollChild>
-                            <EditBox parentKey="Text" multiLine="true" mixin="DBH_CommandInputBoxMixin" >
+                            <EditBox parentKey="Text" multiLine="true" mixin="DBH_CommandInputBoxMixin" autoFocus="false">
                                 <Size x="280" y="1"/>
                                 <Anchors>
                                     <Anchor point="TOPLEFT"/>
@@ -76,6 +94,15 @@
         </Frames>
         <Layers>
             <Layer>
+                <FontString text="Custom group name (optional):" inherits="GameFontNormalSmall">
+                    <Scripts><OnLoad function="MPLM_LocalizeFontString"/></Scripts>
+                    <Anchors><Anchor point="TOPLEFT" x="0" y="-112"/></Anchors>
+                </FontString>
+                <FontString text="Custom name is sent to the bot as listed_as." inherits="GameFontHighlightSmall">
+                    <Size x="290" y="26"/>
+                    <Scripts><OnLoad function="MPLM_LocalizeFontString"/></Scripts>
+                    <Anchors><Anchor point="TOPLEFT" x="0" y="-151"/></Anchors>
+                </FontString>
                 <FontString text="Missing Roles:" inherits="GameFontNormalSmall">
                     <Scripts>
                         <OnLoad function="MPLM_LocalizeFontString"/>
@@ -86,7 +113,7 @@
                 </FontString>
             </Layer>
         </Layers>
-        <Size x="290" y="135"/>
+        <Size x="290" y="270"/>
         <Scripts>
             <OnLoad method="OnLoad"/>
             <OnShow method="OnShow"/>
