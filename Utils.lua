@@ -3,6 +3,24 @@ local private = select(2, ...)
 
 private.Enum = {}
 
+-- Keep names on one line and prevent Discord/WoW formatting from leaking into the post.
+function private:NormalizeGroupName(name)
+    return (name or ""):gsub("[%c|`]", " "):gsub("%s+", " "):match("^%s*(.-)%s*$")
+end
+
+function private:RequestPartyKeys()
+    if not IsInGroup(LE_PARTY_CATEGORY_HOME) or IsInRaid(LE_PARTY_CATEGORY_HOME) then
+        return
+    end
+    local now = GetTime()
+    if self.lastKeyRequest and now - self.lastKeyRequest < 5 then
+        return
+    end
+    self.lastKeyRequest = now
+    self.openRaidLib.RequestKeystoneDataFromParty()
+    C_ChatInfo.SendAddonMessage("LibKS", "R", "PARTY")
+end
+
 function private:IterPartyMembers()
     local i = -1
     return function()
@@ -92,4 +110,3 @@ function private:GeneratePassphrase(wordCount, seed)
 
     return passphrase
 end
-

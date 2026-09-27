@@ -21,11 +21,13 @@ function DBH_CommandInputBoxMixin:OnChar()
     end;
 end
 
-function DBH_CommandInputBoxMixin:SetCommand(command)
+function DBH_CommandInputBoxMixin:SetCommand(command, focus)
     self.command = command;
     self:SetText(command);
-    self:SetFocus();
-    self:HighlightText();
+    if focus ~= false then
+        self:SetFocus();
+        self:HighlightText();
+    end
 end
 
 ---@class DBH_PopupInsertedFrame : Frame
@@ -41,7 +43,7 @@ DBH_PopupInsertedFrameMixin = {}
 local function AreKeystoneInfosEqual(info1, info2)
     return info1.activityId == info2.activityId
     and info1.level == info2.level
-    and (not info1.unit or not info2.unit or info1.unit == info2.unit)
+    and (not info1.unit or not info2.unit or info1.owner == info2.owner)
 end
 
 ---Update the key dropdown
@@ -50,7 +52,11 @@ function DBH_PopupInsertedFrameMixin:UpdateKeyDropdown(keyInfoToSelect)
     self.selectedKeyInfo = nil
 
     ---@type KeystoneInfo[]|UnitKeystoneInfo[]
-    local partyKeyData = { self.initInfo }
+    -- Only a manually pasted key survives independently of the current roster.
+    local partyKeyData = {}
+    if self.initInfo and not self.initInfo.unit then
+        tinsert(partyKeyData, self.initInfo)
+    end
     local initInfoRemoved = false
     for keyInfo in private:IterPartyKeys() do
         -- Select the key if it is the same as the one we want to select
@@ -64,6 +70,7 @@ function DBH_PopupInsertedFrameMixin:UpdateKeyDropdown(keyInfoToSelect)
         -- Remove the initInfo from the dropdown
         -- if we would add the same key again
         if self.initInfo
+            and not self.initInfo.unit
             and AreKeystoneInfosEqual(keyInfo, self.initInfo)
             and not initInfoRemoved
         then
@@ -75,7 +82,7 @@ function DBH_PopupInsertedFrameMixin:UpdateKeyDropdown(keyInfoToSelect)
     end
 
     if not self.selectedKeyInfo then
-        self.selectedKeyInfo = self.initInfo
+        self.selectedKeyInfo = partyKeyData[1]
     end
 
     local function IsSelected(data)
@@ -92,7 +99,7 @@ function DBH_PopupInsertedFrameMixin:UpdateKeyDropdown(keyInfoToSelect)
             if not keyInfo.unit or UnitExists(keyInfo.unit) then
                 local text = strupper(keyInfo.dungeonShorthand) .. " +" .. keyInfo.level;
                 if keyInfo.unit then
-                    text = text .. " (" .. UnitName(keyInfo.unit) .. ")"
+                    text = text .. " (" .. (keyInfo.owner or GetUnitName(keyInfo.unit, true)) .. ")"
                 end
                 rootDescription:CreateRadio(text, IsSelected, SetSelected, keyInfo);
             end
@@ -120,7 +127,14 @@ function DBH_PopupInsertedFrameMixin:UpdateRunTypeDropdown()
 end
 
 function DBH_PopupInsertedFrameMixin:InvokeOnChanged()
-    if self.OnChanged then
+    if not self.selectedKeyInfo then
+        local dialog = self:GetParent()
+        if dialog and dialog.GetTextFontString then
+            dialog.data = nil
+            dialog:GetTextFontString():SetText(L["No party keys available. Refresh or paste a keystone link with /dbh."])
+        end
+    end
+    if self.OnChanged and self.selectedKeyInfo then
         self.OnChanged(self.selectedKeyInfo, self.selectedRunType)
     end
 
@@ -128,27 +142,34 @@ function DBH_PopupInsertedFrameMixin:InvokeOnChanged()
 end
 
 function DBH_PopupInsertedFrameMixin:SetCommand(command)
+    local editingName = self.GroupNameInput:HasFocus()
     if command:find("\n") then
         self.MultiLineInput:Show()
         self.SingleLineInputBox:Hide()
-        self:SetHeight(215)
-        self.MultiLineInputBox:SetCommand(command)
+        self:SetHeight(350)
+        self.MultiLineInputBox:SetCommand(command, not editingName)
     else
         self.MultiLineInput:Hide()
         self.SingleLineInputBox:Show()
-        self:SetHeight(135)
-        self.SingleLineInputBox:SetCommand(command)
+        self:SetHeight(270)
+        self.SingleLineInputBox:SetCommand(command, not editingName)
     end
+    -- Keep focus in the name field: reacquiring it triggers InputBoxTemplate's
+    -- select-all handler, which would replace the name on the next keystroke.
     StaticPopup_ResizeShownDialogs()
 end
 
 ---Update the command
 function DBH_PopupInsertedFrameMixin:UpdateCommand()
+    if not self.selectedKeyInfo then
+        self:SetCommand(L["No party keys available. Refresh or paste a keystone link with /dbh."])
+        return
+    end
     local command = ""
     if private:IsKeySupportedByDungeonBuddy(self.selectedKeyInfo) then
-        command = private:GenerateDungeonBuddyCommand(self.selectedKeyInfo, self.selectedRunType, self.RoleSelect:GetShortRolesString())
+        command = private:GenerateDungeonBuddyCommand(self.selectedKeyInfo, self.selectedRunType, self.RoleSelect:GetShortRolesString(), self:GetCustomGroupName())
     else
-        command = private:GenerateBoilerRoomText(self.selectedKeyInfo, self.selectedRunType, self.RoleSelect:GetShortRolesString(), self.randomSeed)
+        command = private:GenerateBoilerRoomText(self.selectedKeyInfo, self.selectedRunType, self.RoleSelect:GetShortRolesString(), self.randomSeed, self:GetCustomGroupName())
     end
     self:SetCommand(command)
 end
@@ -157,6 +178,8 @@ end
 ---@param info KeystoneInfo
 function DBH_PopupInsertedFrameMixin:Initialize(info)
     self.initInfo = info
+    self.randomSeed = math.random(1, 1000000)
+    self.GroupNameInput:SetText(private.db.global.general.customGroupName or "")
 
     self:UpdateRunTypeDropdown()
     self:UpdateKeyDropdown(info)
@@ -165,15 +188,37 @@ function DBH_PopupInsertedFrameMixin:Initialize(info)
 end
 
 function DBH_PopupInsertedFrameMixin:OnLoad()
+    self.GroupNameInput:SetMaxLetters(80)
     self.OnKeystoneUpdate = function(unitId, keystoneInfo, allKeystonesInfo)
         if self:IsShown() then
             self:UpdateKeyDropdown(self.selectedKeyInfo)
+            self:InvokeOnChanged()
         end
     end
 
     self.RoleSelect.OnChanged = function()
         self:InvokeOnChanged()
     end
+    self.GroupNameInput:SetScript("OnTextChanged", function(input, userInput)
+        if userInput then
+            private.db.global.general.customGroupName = private:NormalizeGroupName(input:GetText())
+            self:InvokeOnChanged()
+        end
+    end)
+    self.RefreshKeysButton:SetText(L["Refresh keys"])
+    self.ChatKeysButton:SetText(L["Request keys in chat (!keys)"])
+    self.ChatKeysButton:SetScript("OnClick", function()
+        private:RequestPartyKeysInChat()
+    end)
+    self.RefreshKeysButton:SetScript("OnClick", function()
+        private:RequestPartyKeys()
+        self:UpdateKeyDropdown(self.selectedKeyInfo)
+        self:InvokeOnChanged()
+    end)
+end
+
+function DBH_PopupInsertedFrameMixin:GetCustomGroupName()
+    return private:NormalizeGroupName(self.GroupNameInput:GetText())
 end
 
 function DBH_PopupInsertedFrameMixin:UpdateRoleSelect()
@@ -184,7 +229,7 @@ end
 
 function DBH_PopupInsertedFrameMixin:OnShow()
     private.openRaidLib.RegisterCallback(self, "KeystoneUpdate", "OnKeystoneUpdate")
-    private.openRaidLib:RequestKeystoneDataFromParty()
+    private:RequestPartyKeys()
 
     self.randomSeed = math.random(1, 1000000)
 
@@ -201,7 +246,11 @@ function DBH_PopupInsertedFrameMixin:OnHide()
     self:UnregisterAllEvents();
 end
 
-function DBH_PopupInsertedFrameMixin:OnEvent()
+function DBH_PopupInsertedFrameMixin:OnEvent(event)
+    if event == "GROUP_ROSTER_UPDATE" then
+        self:UpdateKeyDropdown(self.selectedKeyInfo)
+        private:RequestPartyKeys()
+    end
     self:UpdateRoleSelect()
-    self:UpdateCommand()
+    self:InvokeOnChanged()
 end

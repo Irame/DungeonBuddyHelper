@@ -9,6 +9,9 @@ You can also paste a key after the command with <kbd>Shift</kbd>+<kbd>Left Click
 
 Afterwards, copy and paste the command in the appropriate discord channel. Use the bots generated group name for your listing ingame.
 
+Set an optional custom group name to include it in the bot command as `listed_as`.
+Select party members' keys shared through LibOpenRaid/BigWigs, KeystoneLoot replies to `!keys`, or AlterEgo's character-labelled links.
+
 ## Infographic
 
 ![Infographic showing how to use DBH](./Images/Infographic.svg)

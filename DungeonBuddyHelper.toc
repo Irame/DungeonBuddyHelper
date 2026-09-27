@@ -20,6 +20,7 @@ WowWords.lua
 Utils.lua
 LFGFrameUtils.lua
 KeystoneParsing.lua
+PartyKeystones.lua
 DungeonBuddyCommand.lua
 ChatFilter.lua
 OptionsAndDb.lua

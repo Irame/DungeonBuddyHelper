@@ -17,6 +17,7 @@ local helpHeader = L["Commands (%s or %s)"]:format("|cfff4d512/dbh|r", "|cfff4d5
 local helpLines = {
     "|cfff4d512/dbh help|r - " .. L["Shows this help message."],
     "|cfff4d512/dbh opt|r - " .. L["Opens the addon options."],
+    "|cfff4d512/dbh keys|r - " .. L["Send !keys to party chat."],
     "|cfff4d512/dbh|r - " .. L["Shows the Dungeon Buddy command for the key in your inventory."],
     "|cfff4d512/dbh <keystoneLink>|r - " .. L["Shows the Dungeon Buddy command for the given keystone."],
 }
@@ -32,12 +33,16 @@ function addon:OnInitialize()
     private.lfgFrameButton:SetShown(private.db.global.general.lfgFrameButton)
 
     private:InitChatLinks()
+    private:InitializePartyKeystones()
 
     self.WaitingForKeyUpdate = false
     self.OnKeystoneUpdate = function(unitName, keystoneInfo, allKeystonesInfo)
+        if keystoneInfo then
+            private:StorePartyKey(unitName, keystoneInfo.challengeMapID, keystoneInfo.level, "LibOpenRaid")
+        end
         if self.WaitingForKeyUpdate and private:IterPartyKeys()() then
             self.WaitingForKeyUpdate = false
-            self:Print(L["Keystone info received from at least one party member. Try '/lfg' again!"])
+            self:ShowLFGFrameAndDiscordCommand()
         end
     end
 
@@ -53,6 +58,10 @@ function DBH_OnAddonCompartmentClick(self, button)
 end
 
 function addon:ChatCommandHandler(args)
+    if args == "keys" then
+        private:RequestPartyKeysInChat()
+        return
+    end
     if args == "help" or args == "?" then
         self:ShowHelpMessage()
         return
@@ -110,7 +119,7 @@ function addon:ShowLFGFrameAndDiscordCommand(keystoneLink)
                 self:Print(L["No Keystone found in the party. Waiting for keystone info from party members..."])
                 if not self.WaitingForKeyUpdate then
                     self.WaitingForKeyUpdate = true
-                    private.openRaidLib:RequestKeystoneDataFromParty()
+                    private:RequestPartyKeys()
                     C_Timer.After(5, function()
                         if self.WaitingForKeyUpdate then
                             self.WaitingForKeyUpdate = false
