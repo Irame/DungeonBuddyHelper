@@ -30,6 +30,7 @@ function addon:OnInitialize()
     private.lfgFrameButton:SetShown(private.db.global.general.lfgFrameButton)
 
     private:InitChatLinks()
+    private:InitializeKeyStore()
 
     self.WaitingForKeyUpdate = false
     self.OnKeystoneUpdate = function()
