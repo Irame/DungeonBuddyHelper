@@ -93,6 +93,7 @@ function private:InitializeKeyStore()
     frame:SetScript("OnEvent", function(_, event, ...)
         if event == "GROUP_ROSTER_UPDATE" then
             PrunePartyKeys()
+            self:RequestPartyKeys()
         end
     end);
 end
