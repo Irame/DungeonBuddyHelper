@@ -183,8 +183,8 @@ function DBH_PopupInsertedFrameMixin:UpdateRoleSelect()
 end
 
 function DBH_PopupInsertedFrameMixin:OnShow()
-    private.openRaidLib.RegisterCallback(self, "KeystoneUpdate", "OnKeystoneUpdate")
-    private.openRaidLib:RequestKeystoneDataFromParty()
+    private.RegisterKeystoneUpdate(self, "OnKeystoneUpdate")
+    private:RequestPartyKeys()
 
     self.randomSeed = math.random(1, 1000000)
 
@@ -196,7 +196,7 @@ function DBH_PopupInsertedFrameMixin:OnShow()
 end
 
 function DBH_PopupInsertedFrameMixin:OnHide()
-    private.openRaidLib.UnregisterCallback(self, "KeystoneUpdate", "OnKeystoneUpdate")
+    private.UnregisterKeystoneUpdate(self)
 
     self:UnregisterAllEvents();
 end

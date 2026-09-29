@@ -10,8 +10,6 @@ local L = private.L
 local addon = LibStub("AceAddon-3.0"):NewAddon(addonName, "AceConsole-3.0")
 private.addon = addon
 
-private.openRaidLib = LibStub:GetLibrary("LibOpenRaid-1.0")
-
 local helpHeader = L["Commands (%s or %s)"]:format("|cfff4d512/dbh|r", "|cfff4d512/lfg|r")
 
 local helpLines = {
@@ -34,14 +32,14 @@ function addon:OnInitialize()
     private:InitChatLinks()
 
     self.WaitingForKeyUpdate = false
-    self.OnKeystoneUpdate = function(unitName, keystoneInfo, allKeystonesInfo)
+    self.OnKeystoneUpdate = function()
         if self.WaitingForKeyUpdate and private:IterPartyKeys()() then
             self.WaitingForKeyUpdate = false
             self:Print(L["Keystone info received from at least one party member. Try '/lfg' again!"])
         end
     end
 
-    private.openRaidLib.RegisterCallback(self, "KeystoneUpdate", "OnKeystoneUpdate")
+    private.RegisterKeystoneUpdate(self, "OnKeystoneUpdate")
 end
 
 function DBH_OnAddonCompartmentClick(self, button)
@@ -110,7 +108,7 @@ function addon:ShowLFGFrameAndDiscordCommand(keystoneLink)
                 self:Print(L["No Keystone found in the party. Waiting for keystone info from party members..."])
                 if not self.WaitingForKeyUpdate then
                     self.WaitingForKeyUpdate = true
-                    private.openRaidLib:RequestKeystoneDataFromParty()
+                    private:RequestPartyKeys()
                     C_Timer.After(5, function()
                         if self.WaitingForKeyUpdate then
                             self.WaitingForKeyUpdate = false

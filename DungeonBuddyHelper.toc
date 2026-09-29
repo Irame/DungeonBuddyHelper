@@ -16,6 +16,7 @@ Frames/RoleSelect.xml
 Frames/PopupInsertedFrame.xml
 Frames/LFGFrameButton.xml
 
+PartyKeystones.lua
 WowWords.lua
 Utils.lua
 LFGFrameUtils.lua

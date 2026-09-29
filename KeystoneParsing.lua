@@ -360,11 +360,8 @@ function private:GetKeystoneInfoForLink(keystoneLink)
         return
     end
 
-    local info = dungeonInfo[dungeonID]
-    if not info then
-        self.addon:Printf(L["Missing support for dungeon with map id '%d'. Please open a issue on CurseForge or GitHub."], dungeonID)
-        return
-    end
+    local info = private:GetDungeonInfo(dungeonID)
+    if not info then return end
 
     return {
         activityId = info.activityId,
@@ -374,25 +371,14 @@ function private:GetKeystoneInfoForLink(keystoneLink)
 end
 
 ---Gets the Info for the dungeon from the challenge map id passed
----@param unit string The unit to get the keystone info for
----@return UnitKeystoneInfo? keyInfo
-function private:GetKeystoneInfoForUnit(unit)
-    local orlKLeyInfo = private.openRaidLib.GetKeystoneInfo(unit)
-
-    if not orlKLeyInfo or orlKLeyInfo.challengeMapID == 0 then
-        return
-    end
-
-    local info = dungeonInfo[orlKLeyInfo.challengeMapID]
+---@param challengeMapID integer
+---@return DungeonInfo?
+function private:GetDungeonInfo(challengeMapID)
+    local info = dungeonInfo[challengeMapID]
     if not info then
-        self.addon:Printf(L["Missing support for dungeon with map id '%d'. Please open a issue on CurseForge or GitHub."], orlKLeyInfo.challengeMapID)
+        self.addon:Printf(L["Missing support for dungeon with map id '%d'. Please open a issue on CurseForge or GitHub."], challengeMapID)
         return
     end
 
-    return  {
-        activityId = info.activityId,
-        dungeonShorthand = info.dungeonShorthand,
-        level = orlKLeyInfo.level,
-        unit = unit,
-    }
+    return info
 end
