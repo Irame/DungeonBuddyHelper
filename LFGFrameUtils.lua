@@ -5,7 +5,7 @@ local private = select(2, ...)
 -- in the call stack from LFGListEntryCreation_Show down to C_LFGList.SetEntryTitle()
 -- to be able to remove it and to pass down a custom dungeonId
 
-function LFGListEntryCreation_OnPlayStyleSelectedInternal(self, generalPlaystyle)
+local function LFGListEntryCreation_OnPlayStyleSelectedInternal(self, generalPlaystyle)
 	-- local previousPlaystyle = self.generalPlaystyle;
 	self.generalPlaystyle = generalPlaystyle;
 	-- local legacyLFGEntryPlaystyle = Enum.LFGEntryPlaystyle.None;
