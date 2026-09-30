@@ -6,6 +6,7 @@ This is an addon for World of Warcraft to help create a group for the DungeonBud
 
 To use just type `/lfg` or `/dbh` to create a DungeonBuddy-Command for the key in your bags and the current group composition.
 You can also paste a key after the command with <kbd>Shift</kbd>+<kbd>Left Click</kbd> to use this key instead.
+Set an optional custom group name.
 
 Afterwards, copy and paste the command in the appropriate discord channel. Use the bots generated group name for your listing ingame.
 

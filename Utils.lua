@@ -3,6 +3,21 @@ local private = select(2, ...)
 
 private.Enum = {}
 
+function private:GetCustomGroupName()
+    local groupName = self.db.global.general.useCustomGroupName and self.db.global.general.customGroupName or nil
+
+    if groupName then
+        groupName = (groupName or ""):gsub("[%c|`]", " "):gsub("%s+", " ")
+        groupName = string.trim(groupName)
+
+        if groupName == "" then
+            groupName = nil
+        end
+    end
+
+    return groupName
+end
+
 function private:IterPartyMembers()
     local i = -1
     return function()

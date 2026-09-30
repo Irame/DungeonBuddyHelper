@@ -32,6 +32,36 @@
                     <Anchor point="TOPRIGHT" relativeKey="$parent.RunTypeDropdown" relativePoint="BOTTOMRIGHT" x="0" y="-10"/>
                 </Anchors>
             </Frame>
+            <CheckButton parentKey="CustomGroupNameCheckBox">
+                <Size x="15" y="15"/>
+                <Anchors>
+                    <Anchor point="TOP" relativeKey="$parent.RoleSelect" relativePoint="BOTTOM" x="0" y="-8" />
+                    <Anchor point="LEFT" relativeKey="$parent.RunTypeDropdown" x="20" y="0" />
+                </Anchors>
+                <NormalTexture atlas="checkbox-minimal" useAtlasSize="true"/>
+                <PushedTexture atlas="checkbox-minimal" useAtlasSize="true"/>
+                <CheckedTexture atlas="checkmark-minimal" useAtlasSize="true"/>
+            </CheckButton>
+            <EditBox parentKey="CustomGroupNameInputBox" inherits="InputBoxTemplate" autoFocus="false">
+                <Size y="20"/>
+                <Anchors>
+                    <Anchor point="TOP" relativeKey="$parent.CustomGroupNameCheckBox" relativePoint="BOTTOM" x="0" y="-5" />
+                    <Anchor point="LEFT" relativeKey="$parent.RunTypeDropdown" x="0" y="0" />
+                    <Anchor point="RIGHT" relativeKey="$parent.RunTypeDropdown" x="0" y="0" />
+                </Anchors>
+                <Scripts>
+                    <OnEscapePressed>
+                        self:ClearFocus()
+                        self:GetParent():UpdateCommand()
+                    </OnEscapePressed>
+                    <OnEnterPressed>
+                        self:ClearFocus()
+                        self:GetParent():UpdateCommand()
+                    </OnEnterPressed>
+                </Scripts>
+                <FontString inherits="ChatFontNormal"/>
+            </EditBox>
+
             <EditBox parentKey="SingleLineInputBox" inherits="InputBoxTemplate" mixin="DBH_CommandInputBoxMixin">
                 <Size y="20"/>
                 <Anchors>
@@ -96,9 +126,17 @@
                         <Anchor point="RIGHT" relativeKey="$parent.RoleSelect" relativePoint="LEFT" x="-5" y="0"/>
                     </Anchors>
                 </FontString>
+                <FontString text="Custom group name" inherits="GameFontNormalSmall">
+                    <Scripts>
+                        <OnLoad function="MPLM_LocalizeFontString"/>
+                    </Scripts>
+                    <Anchors>
+                        <Anchor point="LEFT" relativeKey="$parent.CustomGroupNameCheckBox" relativePoint="RIGHT" x="5" y="0"/>
+                    </Anchors>
+                </FontString>
             </Layer>
         </Layers>
-        <Size x="290" y="135"/>
+        <Size x="290"/>
         <Scripts>
             <OnLoad method="OnLoad"/>
             <OnShow method="OnShow"/>

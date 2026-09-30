@@ -183,7 +183,7 @@ local function LFGListEntryCreation_Show(self, baseFilters, selectedCategory, se
 	LFGListEntryCreation_UpdateValidState(self);
 
 	LFGListFrame_SetActivePanel(self:GetParent(), self);
-	self.Name:SetFocus();
+	--self.Name:SetFocus();
 	self.Label:SetText(categoryInfo.name);
 
 	LFGListEntryCreation_CheckAutoCreate(self);

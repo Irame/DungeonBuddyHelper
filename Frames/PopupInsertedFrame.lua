@@ -21,11 +21,15 @@ function DBH_CommandInputBoxMixin:OnChar()
     end;
 end
 
-function DBH_CommandInputBoxMixin:SetCommand(command)
+function DBH_CommandInputBoxMixin:SetCommand(command, setFocus)
     self.command = command;
     self:SetText(command);
-    self:SetFocus();
-    self:HighlightText();
+    if setFocus then
+        self:SetFocus();
+    end
+    if self:HasFocus() then
+        self:HighlightText();
+    end
 end
 
 ---@class DBH_PopupInsertedFrame : Frame
@@ -36,6 +40,8 @@ end
 ---@field SingleLineInputBox DBH_CommandInputBox
 ---@field MultiLineInput Frame
 ---@field MultiLineInputBox DBH_CommandInputBox
+---@field CustomGroupNameCheckBox CheckButton
+---@field CustomGroupNameInputBox EditBox
 ---@field OnChanged fun(keyInfo: UnitKeystoneInfo|KeystoneInfo, runType: RunType)
 DBH_PopupInsertedFrameMixin = {}
 
@@ -128,28 +134,45 @@ function DBH_PopupInsertedFrameMixin:InvokeOnChanged()
     self:UpdateCommand()
 end
 
+function DBH_PopupInsertedFrameMixin:UpdateHeight()
+    local height = 160
+    if self.MultiLineInput:IsShown() then
+        height = height + 80
+    end
+    if self.CustomGroupNameInputBox:IsShown() then
+        height = height + 25
+    end
+    self:SetHeight(height)
+    StaticPopup_ResizeShownDialogs()
+end
+
+function DBH_PopupInsertedFrameMixin:UpdateCustomGroupNameInputBox()
+    self.CustomGroupNameInputBox:SetShown(private.db.global.general.useCustomGroupName)
+    self.CustomGroupNameInputBox:SetText(private.db.global.general.customGroupName or "")
+    self:UpdateHeight()
+end
+
 function DBH_PopupInsertedFrameMixin:SetCommand(command)
+    local setFocusToCommand = not self.CustomGroupNameInputBox:HasFocus()
     if command:find("\n") then
         self.MultiLineInput:Show()
         self.SingleLineInputBox:Hide()
-        self:SetHeight(215)
-        self.MultiLineInputBox:SetCommand(command)
+        self.MultiLineInputBox:SetCommand(command, setFocusToCommand)
     else
         self.MultiLineInput:Hide()
         self.SingleLineInputBox:Show()
-        self:SetHeight(135)
-        self.SingleLineInputBox:SetCommand(command)
+        self.SingleLineInputBox:SetCommand(command, setFocusToCommand)
     end
-    StaticPopup_ResizeShownDialogs()
+    self:UpdateHeight()
 end
 
 ---Update the command
 function DBH_PopupInsertedFrameMixin:UpdateCommand()
     local command = ""
     if private:IsKeySupportedByDungeonBuddy(self.selectedKeyInfo) then
-        command = private:GenerateDungeonBuddyCommand(self.selectedKeyInfo, self.selectedRunType, self.RoleSelect:GetShortRolesString())
+        command = private:GenerateDungeonBuddyCommand(self.selectedKeyInfo, self.selectedRunType, self.RoleSelect:GetShortRolesString(), private:GetCustomGroupName())
     else
-        command = private:GenerateBoilerRoomText(self.selectedKeyInfo, self.selectedRunType, self.RoleSelect:GetShortRolesString(), self.randomSeed)
+        command = private:GenerateBoilerRoomText(self.selectedKeyInfo, self.selectedRunType, self.RoleSelect:GetShortRolesString(), self.randomSeed, private:GetCustomGroupName())
     end
     self:SetCommand(command)
 end
@@ -186,6 +209,22 @@ function DBH_PopupInsertedFrameMixin:OnLoad()
 
     self.RefreshKeysButton:SetOnClickHandler(RefreshKeys);
     self.RefreshKeysButton:SetTooltipInfo(nil, L["Request keys from party members."]);
+
+    self.CustomGroupNameCheckBox:SetScript("OnClick", function(checkbox)
+        private.db.global.general.useCustomGroupName = checkbox:GetChecked()
+        self:UpdateCustomGroupNameInputBox()
+        self:InvokeOnChanged()
+        if checkbox:GetChecked() then
+            self.CustomGroupNameInputBox:SetFocus()
+        end
+    end)
+
+    self.CustomGroupNameInputBox:SetScript("OnTextChanged", function(input, userInput)
+        if userInput then
+            private.db.global.general.customGroupName = input:GetText()
+            self:InvokeOnChanged()
+        end
+    end)
 end
 
 function DBH_PopupInsertedFrameMixin:UpdateRoleSelect()
@@ -207,6 +246,9 @@ function DBH_PopupInsertedFrameMixin:OnShow()
     self:RegisterEvent("GROUP_ROSTER_UPDATE")
 
     self.RefreshKeysButton:SetShown(IsInGroup(LE_PARTY_CATEGORY_HOME))
+
+    self.CustomGroupNameCheckBox:SetChecked(private.db.global.general.useCustomGroupName)
+    self:UpdateCustomGroupNameInputBox()
 end
 
 function DBH_PopupInsertedFrameMixin:OnHide()

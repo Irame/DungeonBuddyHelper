@@ -116,8 +116,14 @@ private.Enum.RunType = {
 ---@param info KeystoneInfo The info of the keystone
 ---@param runType RunType The type of the run
 ---@param missingRoles string The roles that are missing to form a dungeon group
-function private:GenerateDungeonBuddyCommand(info, runType, missingRoles)
-    return string.format("/lfgquick quick_dungeon_string:%s %d%s %s %s", info.dungeonShorthand, info.level, runType, private:GetPlayerRole(), missingRoles)
+---@param groupName? string The optional name of the group
+---@return string command The lfgquick command for the dungeon buddy
+function private:GenerateDungeonBuddyCommand(info, runType, missingRoles, groupName)
+    local command = string.format("/lfgquick quick_dungeon_string:%s %d%s %s %s", info.dungeonShorthand, info.level, runType, private:GetPlayerRole(), missingRoles)
+    if groupName and groupName ~= "" then
+        command = command .. " listed_as:" .. groupName
+    end
+    return command
 end
 
 --- Generates a text to mention the missing roles in a Discord message
@@ -240,22 +246,26 @@ local discordRunTypeNames = {
 ---@param missingRoles string
 ---@param randomSeed number
 ---@return string
-function private:GenerateBoilerRoomText(info, runType, missingRoles, randomSeed)
+function private:GenerateBoilerRoomText(info, runType, missingRoles, randomSeed, groupName)
     local runTypeText = discordRunTypeNames[runType] or discordRunTypeNames[private.Enum.RunType.TimeButComplete]
-    local groupPostfix = self:GenerateRandomUppercaseString(3, randomSeed)
     local dungeonShorthand = strupper(info.dungeonShorthand)
     local password = self:GeneratePassphrase(3, randomSeed)
     local missingRolesMentions = GenerateDiscordRolesText(info, missingRoles)
     local specificRequirements = GenerateSpecificRequirementsText(info)
 
+    if not groupName then
+        local groupPostfix = self:GenerateRandomUppercaseString(3, randomSeed)
+        groupName = string.format("NOP %s %s", dungeonShorthand, groupPostfix)
+    end
+
     return string.format([[
-- `Group Name:` NOP %s %s
+- `Group Name:` %s
 - `Dungeon & difficulty:` %s +%d
 - `Timing expectations:` %s
 - `Looking for:` %s
 - `Specific Requirements:` %s
 - `Password:` %s]],
-        dungeonShorthand, groupPostfix,
+        groupName,
         dungeonShorthand, info.level,
         runTypeText,
         missingRolesMentions,
@@ -310,13 +320,21 @@ function private:ShowDungeonBuddyCommandToPlayer(info)
                 private:ShowLFGFrameWithEntryCreationForActivity(this.data, this.insertedFrame:IsCompletionChecked())
             end
             if LFGListFrame.EntryCreation.Name:IsVisible() and this.data then
+                local groupName = private:GetCustomGroupName()
+                local helpText
+                if groupName then
+                    helpText = L['Enter the name of you group "%s" here']:format(groupName)
+                else
+                    helpText = L["Enter the name you listed you group as in the NoP discord (e.g. NoP %s XX)"]:format(strupper(this.data.dungeonShorthand))
+                end
                 local helpTipInfo = {
-                    text = L["Enter the name you listed you group as in the NoP discord (e.g. NoP %s XX)"]:format(strupper(this.data.dungeonShorthand)),
+                    text = helpText,
                     buttonStyle = HelpTip.ButtonStyle.Close,
                     targetPoint = HelpTip.Point.RightEdgeCenter,
                 }
 
                 HelpTip:Show(LFGListFrame.EntryCreation.Name, helpTipInfo, LFGListFrame.EntryCreation.Name)
+                LFGListFrame.EntryCreation.Name:SetFocus()
             end
         end,
         OnCancel = function(this, ...)
