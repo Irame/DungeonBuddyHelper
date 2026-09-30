@@ -36,7 +36,7 @@ function addon:OnInitialize()
     self.OnKeystoneUpdate = function()
         if self.WaitingForKeyUpdate and private:IterPartyKeys()() then
             self.WaitingForKeyUpdate = false
-            self:Print(L["Keystone info received from at least one party member. Try '/lfg' again!"])
+            self:ShowLFGFrameAndDiscordCommand()
         end
     end
 
