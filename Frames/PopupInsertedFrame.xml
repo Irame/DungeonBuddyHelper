@@ -9,6 +9,18 @@
                     <Anchor point="TOP" y="-10"/>
                 </Anchors>
             </DropdownButton>
+            <Button parentKey="RefreshKeysButton" inherits="IconButtonTemplate">
+                <KeyValues>
+                    <KeyValue key="iconAtlas" value="talents-button-undo" type="string"/>
+                    <KeyValue key="useAtlasSize" value="true" type="boolean"/>
+                    <KeyValue key="useIconAsHighlight" value="true" type="boolean"/>
+                    <KeyValue key="tooltipTextColor" value="HIGHLIGHT_FONT_COLOR" type="global"/>
+                </KeyValues>
+                <Size x="20" y="20"/>
+                <Anchors>
+                    <Anchor point="LEFT" relativeKey="$parent.KeySelectDropdown" relativePoint="RIGHT" x="5"/>
+                </Anchors>
+            </Button>
             <DropdownButton parentKey="RunTypeDropdown" inherits="WowStyle1DropdownTemplate">
                 <Size x="200" y="25"></Size>
                 <Anchors>

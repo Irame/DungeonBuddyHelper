@@ -31,6 +31,7 @@ end
 ---@class DBH_PopupInsertedFrame : Frame
 ---@field RunTypeDropdown WowStyle1DropdownTemplate
 ---@field KeySelectDropdown WowStyle1DropdownTemplate
+---@field RefreshKeysButton IconButtonTemplate
 ---@field RoleSelect DBH_RoleSelect
 ---@field SingleLineInputBox DBH_CommandInputBox
 ---@field MultiLineInput Frame
@@ -174,6 +175,17 @@ function DBH_PopupInsertedFrameMixin:OnLoad()
     self.RoleSelect.OnChanged = function()
         self:InvokeOnChanged()
     end
+
+    local function RefreshKeys()
+        private:RequestPartyKeys()
+        self.RefreshKeysButton:SetEnabledState(false)
+        C_Timer.NewTimer(5, function()
+            self.RefreshKeysButton:SetEnabledState(true)
+        end);
+    end
+
+    self.RefreshKeysButton:SetOnClickHandler(RefreshKeys);
+    self.RefreshKeysButton:SetTooltipInfo(nil, L["Request keys from party members."]);
 end
 
 function DBH_PopupInsertedFrameMixin:UpdateRoleSelect()
@@ -193,6 +205,8 @@ function DBH_PopupInsertedFrameMixin:OnShow()
     self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
     self:RegisterEvent("PLAYER_ROLES_ASSIGNED")
     self:RegisterEvent("GROUP_ROSTER_UPDATE")
+
+    self.RefreshKeysButton:SetShown(IsInGroup(LE_PARTY_CATEGORY_HOME))
 end
 
 function DBH_PopupInsertedFrameMixin:OnHide()
@@ -201,7 +215,11 @@ function DBH_PopupInsertedFrameMixin:OnHide()
     self:UnregisterAllEvents();
 end
 
-function DBH_PopupInsertedFrameMixin:OnEvent()
+function DBH_PopupInsertedFrameMixin:OnEvent(event, ...)
     self:UpdateRoleSelect()
     self:UpdateCommand()
+
+    if event == "GROUP_ROSTER_UPDATE" then
+        self.RefreshKeysButton:SetShown(IsInGroup(LE_PARTY_CATEGORY_HOME))
+    end
 end
