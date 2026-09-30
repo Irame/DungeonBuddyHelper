@@ -295,7 +295,8 @@ function private:ShowDungeonBuddyCommandToPlayer(info)
         button1 = OKAY,
         OnShow = function(this, ...)
             this.insertedFrame.OnChanged = function(keyInfo, runType)
-                this.data = keyInfo
+                this.data.keyInfo = keyInfo
+                this.data.runType = runType
                 if private.db.global.general.openLfgFrame == private.Enum.OpenLfgFrame.OnDialog then
                     private:ShowLFGFrameWithEntryCreationForActivity(keyInfo, runType)
                 end
@@ -309,7 +310,7 @@ function private:ShowDungeonBuddyCommandToPlayer(info)
                 end
             end
 
-            this.insertedFrame:Initialize(this.data)
+            this.insertedFrame:Initialize(this.data.keyInfo)
         end,
         OnHide = function(this, ...)
             this.insertedFrame.OnChanged = nil
@@ -317,15 +318,15 @@ function private:ShowDungeonBuddyCommandToPlayer(info)
         end,
         OnAccept = function(this, ...)
             if private.db.global.general.openLfgFrame == private.Enum.OpenLfgFrame.OnOkay then
-                private:ShowLFGFrameWithEntryCreationForActivity(this.data, this.insertedFrame:IsCompletionChecked())
+                private:ShowLFGFrameWithEntryCreationForActivity(this.data.keyInfo, this.data.runType)
             end
-            if LFGListFrame.EntryCreation.Name:IsVisible() and this.data then
+            if LFGListFrame.EntryCreation.Name:IsVisible() and this.data.keyInfo then
                 local groupName = private:GetCustomGroupName()
                 local helpText
                 if groupName then
                     helpText = L['Enter the name of you group "%s" here']:format(groupName)
                 else
-                    helpText = L["Enter the name you listed you group as in the NoP discord (e.g. NoP %s XX)"]:format(strupper(this.data.dungeonShorthand))
+                    helpText = L["Enter the name you listed you group as in the NoP discord (e.g. NoP %s XX)"]:format(strupper(this.data.keyInfo.dungeonShorthand))
                 end
                 local helpTipInfo = {
                     text = helpText,
@@ -347,5 +348,9 @@ function private:ShowDungeonBuddyCommandToPlayer(info)
         editBoxWidth = 285,
     }
 
-    StaticPopup_Show("SHOW_DB_COMMAND", KeyLevelInfoToDiscordChannel(GetNopKeyLevelInfo(info.level)), nil, info, insertedFrame)
+    local data = {
+        keyInfo = info
+    }
+
+    StaticPopup_Show("SHOW_DB_COMMAND", KeyLevelInfoToDiscordChannel(GetNopKeyLevelInfo(info.level)), nil, data, insertedFrame)
 end
