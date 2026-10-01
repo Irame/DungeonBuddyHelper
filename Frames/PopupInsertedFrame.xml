@@ -71,7 +71,7 @@
                 <Scripts>
                     <OnEscapePressed method="OnEscapePressed"/>
                     <OnMouseUp method="OnMouseUp"/>
-                    <OnChar method="OnChar"/>
+                    <OnTextChanged method="OnTextChanged"/>
                 </Scripts>
                 <FontString inherits="ChatFontNormal"/>
             </EditBox>
@@ -102,7 +102,7 @@
                                     <OnCursorChanged function="ScrollingEdit_OnCursorChanged"/>
                                     <OnEscapePressed method="OnEscapePressed"/>
                                     <OnMouseUp method="OnMouseUp"/>
-                                    <OnChar method="OnChar"/>
+                                    <OnTextChanged method="OnTextChanged"/>
                                 </Scripts>
                                 <FontString inherits="ChatFontSmall"/>
                             </EditBox>

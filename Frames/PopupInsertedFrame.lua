@@ -17,8 +17,8 @@ function DBH_CommandInputBoxMixin:OnMouseUp()
     self:HighlightText();
 end
 
-function DBH_CommandInputBoxMixin:OnChar()
-    if self.command then
+function DBH_CommandInputBoxMixin:OnTextChanged(userInput)
+    if userInput and self.command then
         self:SetText(self.command);
         self:HighlightText();
     end;
