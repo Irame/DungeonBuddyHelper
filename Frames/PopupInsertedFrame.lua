@@ -52,7 +52,7 @@ local function AreKeystoneInfosEqual(info1, info2)
 end
 
 ---Update the key dropdown
----@param keyInfoToSelect KeystoneInfo|UnitKeystoneInfo
+---@param keyInfoToSelect? KeystoneInfo|UnitKeystoneInfo
 function DBH_PopupInsertedFrameMixin:UpdateKeyDropdown(keyInfoToSelect)
     self.selectedKeyInfo = nil
 
@@ -82,8 +82,11 @@ function DBH_PopupInsertedFrameMixin:UpdateKeyDropdown(keyInfoToSelect)
     end
 
     if not self.selectedKeyInfo then
-        self.selectedKeyInfo = self.initInfo
+        self.selectedKeyInfo = partyKeyData[1]
     end
+
+    -- selectedKeyInfo might have changed, so we need to invoke the onChanged callback
+    self:InvokeOnChanged()
 
     local function IsSelected(data)
         return self.selectedKeyInfo == data
@@ -169,16 +172,18 @@ end
 ---Update the command
 function DBH_PopupInsertedFrameMixin:UpdateCommand()
     local command = ""
-    if private:IsKeySupportedByDungeonBuddy(self.selectedKeyInfo) then
-        command = private:GenerateDungeonBuddyCommand(self.selectedKeyInfo, self.selectedRunType, self.RoleSelect:GetShortRolesString(), private:GetCustomGroupName())
-    else
-        command = private:GenerateBoilerRoomText(self.selectedKeyInfo, self.selectedRunType, self.RoleSelect:GetShortRolesString(), self.randomSeed, private:GetCustomGroupName())
+    if self.selectedKeyInfo then
+        if private:IsKeySupportedByDungeonBuddy(self.selectedKeyInfo) then
+            command = private:GenerateDungeonBuddyCommand(self.selectedKeyInfo, self.selectedRunType, self.RoleSelect:GetShortRolesString(), private:GetCustomGroupName())
+        else
+            command = private:GenerateBoilerRoomText(self.selectedKeyInfo, self.selectedRunType, self.RoleSelect:GetShortRolesString(), self.randomSeed, private:GetCustomGroupName())
+        end
     end
     self:SetCommand(command)
 end
 
 ---Initialize the popup inserted frame
----@param info KeystoneInfo
+---@param info? KeystoneInfo
 function DBH_PopupInsertedFrameMixin:Initialize(info)
     self.initInfo = info
 

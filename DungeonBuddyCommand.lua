@@ -281,7 +281,7 @@ private.Enum.OpenLfgFrame = {
 
 ---Creates a command used by the DungeonBuddy on the No Pressure Discord
 ---and shows a popup to the player where they can copy it
----@param info KeystoneInfo The info of the keystone
+---@param info KeystoneInfo The info of the keystone (no UnitKeystoneInfo should be passed here)
 function private:ShowDungeonBuddyCommandToPlayer(info)
     local insertedFrame = _G["DBH_PopupInsertedFrame"]
     insertedFrame:Show();
@@ -291,22 +291,27 @@ function private:ShowDungeonBuddyCommandToPlayer(info)
         .. L["Please use the chat message below to look for people manually in the 'Boiler Room' channel %s."]
 
     StaticPopupDialogs["SHOW_DB_COMMAND"] = StaticPopupDialogs["SHOW_DB_COMMAND"] or {
-        text = dungeonBuddyTextTemplate,
+        text = L["No party keys available. Refresh or paste a keystone link with /dbh."],
         button1 = OKAY,
         OnShow = function(this, ...)
             this.insertedFrame.OnChanged = function(keyInfo, runType)
                 this.data.keyInfo = keyInfo
                 this.data.runType = runType
-                if private.db.global.general.openLfgFrame == private.Enum.OpenLfgFrame.OnDialog then
-                    private:ShowLFGFrameWithEntryCreationForActivity(keyInfo, runType)
-                end
-
                 local text = this:GetTextFontString()
-                local nopKeyLevelInfo = GetNopKeyLevelInfo(keyInfo.level)
-                if nopKeyLevelInfo.supportedByDungeonBuddy then
-                    text:SetFormattedText(dungeonBuddyTextTemplate, KeyLevelInfoToDiscordChannel(nopKeyLevelInfo))
+                if keyInfo then
+                    this.insertedFrame:Show()
+                    if private.db.global.general.openLfgFrame == private.Enum.OpenLfgFrame.OnDialog then
+                        private:ShowLFGFrameWithEntryCreationForActivity(keyInfo, runType)
+                    end
+
+                    local nopKeyLevelInfo = GetNopKeyLevelInfo(keyInfo.level)
+                    if nopKeyLevelInfo.supportedByDungeonBuddy then
+                        text:SetFormattedText(dungeonBuddyTextTemplate, KeyLevelInfoToDiscordChannel(nopKeyLevelInfo))
+                    else
+                        text:SetFormattedText(boilerRoomTextTemplate, DungeonBuddyMaxKeyLevel+1, KeyLevelInfoToDiscordChannel(nopKeyLevelInfo))
+                    end
                 else
-                    text:SetFormattedText(boilerRoomTextTemplate, DungeonBuddyMaxKeyLevel+1, KeyLevelInfoToDiscordChannel(nopKeyLevelInfo))
+                    text:SetText("|cffff3636" .. L["No party keys available. Refresh or paste a keystone link with /dbh."] .. "|r")
                 end
             end
 
@@ -321,25 +326,27 @@ function private:ShowDungeonBuddyCommandToPlayer(info)
             end
         end,
         OnAccept = function(this, ...)
-            if private.db.global.general.openLfgFrame == private.Enum.OpenLfgFrame.OnOkay then
-                private:ShowLFGFrameWithEntryCreationForActivity(this.data.keyInfo, this.data.runType)
-            end
-            if LFGListFrame.EntryCreation.Name:IsVisible() and this.data.keyInfo then
-                local groupName = private:GetCustomGroupName()
-                local helpText
-                if groupName then
-                    helpText = L['Enter the name of you group "%s" here']:format(groupName)
-                else
-                    helpText = L["Enter the name you listed you group as in the NoP discord (e.g. NoP %s XX)"]:format(strupper(this.data.keyInfo.dungeonShorthand))
+            if this.data.keyInfo then
+                if private.db.global.general.openLfgFrame == private.Enum.OpenLfgFrame.OnOkay then
+                    private:ShowLFGFrameWithEntryCreationForActivity(this.data.keyInfo, this.data.runType)
                 end
-                local helpTipInfo = {
-                    text = helpText,
-                    buttonStyle = HelpTip.ButtonStyle.Close,
-                    targetPoint = HelpTip.Point.RightEdgeCenter,
-                }
+                if LFGListFrame.EntryCreation.Name:IsVisible() then
+                    local groupName = private:GetCustomGroupName()
+                    local helpText
+                    if groupName then
+                        helpText = L['Enter the name of you group "%s" here']:format(groupName)
+                    else
+                        helpText = L["Enter the name you listed you group as in the NoP discord (e.g. NoP %s XX)"]:format(strupper(this.data.keyInfo.dungeonShorthand))
+                    end
+                    local helpTipInfo = {
+                        text = helpText,
+                        buttonStyle = HelpTip.ButtonStyle.Close,
+                        targetPoint = HelpTip.Point.RightEdgeCenter,
+                    }
 
-                HelpTip:Show(LFGListFrame.EntryCreation.Name, helpTipInfo, LFGListFrame.EntryCreation.Name)
-                LFGListFrame.EntryCreation.Name:SetFocus()
+                    HelpTip:Show(LFGListFrame.EntryCreation.Name, helpTipInfo, LFGListFrame.EntryCreation.Name)
+                    LFGListFrame.EntryCreation.Name:SetFocus()
+                end
             end
         end,
         timeout = 0,
@@ -352,5 +359,5 @@ function private:ShowDungeonBuddyCommandToPlayer(info)
         keyInfo = info
     }
 
-    StaticPopup_Show("SHOW_DB_COMMAND", KeyLevelInfoToDiscordChannel(GetNopKeyLevelInfo(info.level)), nil, data, insertedFrame)
+    StaticPopup_Show("SHOW_DB_COMMAND", nil, nil, data, insertedFrame)
 end

@@ -103,8 +103,8 @@ function addon:ShowLFGFrameAndDiscordCommand(keystoneLink)
 
     if not info then
         -- Get the first keystone in the party
-        info = private:IterPartyKeys()()
-        if not info then
+        local firstPartyKey = private:IterPartyKeys()()
+        if not firstPartyKey then
             if IsInGroup(LE_PARTY_CATEGORY_HOME) then
                 self:Print(L["No Keystone found in the party. Waiting for keystone info from party members..."])
                 if not self.WaitingForKeyUpdate then
