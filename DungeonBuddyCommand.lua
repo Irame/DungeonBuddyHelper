@@ -313,8 +313,12 @@ function private:ShowDungeonBuddyCommandToPlayer(info)
             this.insertedFrame:Initialize(this.data.keyInfo)
         end,
         OnHide = function(this, ...)
-            this.insertedFrame.OnChanged = nil
-            this.insertedFrame:Hide();
+            -- Reusing a StaticPopup hides it and releases insertedFrame before
+            -- calling OnCancel. Keep cleanup here, while the frame is attached.
+            if this.insertedFrame then
+                this.insertedFrame.OnChanged = nil
+                this.insertedFrame:Hide();
+            end
         end,
         OnAccept = function(this, ...)
             if private.db.global.general.openLfgFrame == private.Enum.OpenLfgFrame.OnOkay then
@@ -337,10 +341,6 @@ function private:ShowDungeonBuddyCommandToPlayer(info)
                 HelpTip:Show(LFGListFrame.EntryCreation.Name, helpTipInfo, LFGListFrame.EntryCreation.Name)
                 LFGListFrame.EntryCreation.Name:SetFocus()
             end
-        end,
-        OnCancel = function(this, ...)
-            this.insertedFrame.OnChanged = nil
-            this.insertedFrame:Hide();
         end,
         timeout = 0,
         whileDead = 1,
