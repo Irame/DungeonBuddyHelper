@@ -335,8 +335,8 @@ local dungeonInfo = {
 ---@class KeystoneInfo : DungeonInfo
 ---@field level integer the level of the keystone
 
----@class UnitKeystoneInfo : KeystoneInfo
----@field unit string
+---@class OwnedKeystoneInfo : KeystoneInfo
+---@field owner string The normalized full name of the player that owns the keystone
 
 local function ParseKeystoneLink(link)
     if not link then

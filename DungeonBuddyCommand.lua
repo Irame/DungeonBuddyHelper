@@ -281,7 +281,7 @@ private.Enum.OpenLfgFrame = {
 
 ---Creates a command used by the DungeonBuddy on the No Pressure Discord
 ---and shows a popup to the player where they can copy it
----@param info KeystoneInfo The info of the keystone (no UnitKeystoneInfo should be passed here)
+---@param info KeystoneInfo The info of the keystone (no OwnedKeystoneInfo should be passed here)
 function private:ShowDungeonBuddyCommandToPlayer(info)
     local insertedFrame = _G["DBH_PopupInsertedFrame"]
     insertedFrame:Show();

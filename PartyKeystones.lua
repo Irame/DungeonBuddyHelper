@@ -20,24 +20,12 @@ local handlers = {}
 local keys = {}
 local lifetime = 1800
 
-local function IsPublicString(value)
-    return not (issecretvalue and issecretvalue(value)) and type(value) == "string"
-end
-
-local function FullName(name)
-    if not IsPublicString(name) then return end
-    if not name:find("-", 1, true) then
-        name = name .. "-" .. GetNormalizedRealmName()
-    end
-    return name:gsub("%s", "")
-end
-
 local function FindPartyKeyOwner(sender)
     if not IsInGroup(LE_PARTY_CATEGORY_HOME) or IsInRaid(LE_PARTY_CATEGORY_HOME) then return end
-    local owner = FullName(sender)
+    local owner = private:FullName(sender)
     if not owner then return end
     for unit in private:IterPartyMembers() do
-        if unit ~= "player" and UnitExists(unit) and FullName(GetUnitName(unit, true)) == owner then
+        if unit ~= "player" and UnitExists(unit) and private:UnitFullName(unit) == owner then
             return owner, unit
         end
     end
@@ -45,10 +33,13 @@ end
 
 ---@param unit UnitId
 ---@return KeyStoreEntry?
+---@return string? owner
 local function GetSharedPartyKey(unit)
-    local entry = keys[FullName(GetUnitName(unit, true))]
+    local owner = private:UnitFullName(unit)
+    if not owner then return end
+    local entry = keys[owner]
     if entry and GetTime() - entry.received < lifetime then
-        return entry
+        return entry, owner
     end
 end
 
@@ -145,9 +136,9 @@ end
 
 ---@param challengeMapID integer
 ---@param level integer
----@param unit UnitId
----@return UnitKeystoneInfo?
-local function GetKeystoneInfoFromChallengeMapID(challengeMapID, level, unit)
+---@param owner? string
+---@return OwnedKeystoneInfo?
+local function GetKeystoneInfoFromChallengeMapID(challengeMapID, level, owner)
     if not challengeMapID or challengeMapID == 0 then
         return
     end
@@ -159,37 +150,37 @@ local function GetKeystoneInfoFromChallengeMapID(challengeMapID, level, unit)
         activityId = info.activityId,
         dungeonShorthand = info.dungeonShorthand,
         level = level,
-        unit = unit,
+        owner = owner,
     }
 end
 
 ---@param unit UnitId
----@return UnitKeystoneInfo?
+---@return OwnedKeystoneInfo?
 local function GetKeystoneInfoFromLibOpenRaid(unit)
     local orlKLeyInfo = LibOpenRaid.GetKeystoneInfo(unit)
 
     if not orlKLeyInfo then return end
 
-    return GetKeystoneInfoFromChallengeMapID(orlKLeyInfo.challengeMapID, orlKLeyInfo.level, unit)
+    return GetKeystoneInfoFromChallengeMapID(orlKLeyInfo.challengeMapID, orlKLeyInfo.level, private:UnitFullName(unit))
 end
 
 ---@param unit UnitId
----@return UnitKeystoneInfo?
+---@return OwnedKeystoneInfo?
 local function GetKeystoneInfoFromKeyStore(unit)
-    local keyStoreEntry = GetSharedPartyKey(unit)
+    local keyStoreEntry, owner = GetSharedPartyKey(unit)
 
     if not keyStoreEntry then return end
 
-    return GetKeystoneInfoFromChallengeMapID(keyStoreEntry.challengeMapID, keyStoreEntry.level, unit)
+    return GetKeystoneInfoFromChallengeMapID(keyStoreEntry.challengeMapID, keyStoreEntry.level, owner)
 end
 
 ---@param unit UnitId The unit to get the keystone info for
----@return UnitKeystoneInfo? keyInfo
+---@return OwnedKeystoneInfo? keyInfo
 function private:GetKeystoneInfoForUnit(unit)
     if not UnitExists(unit) then return end
 
     if unit == "player" then
-        return GetKeystoneInfoFromChallengeMapID(C_MythicPlus.GetOwnedKeystoneChallengeMapID(), C_MythicPlus.GetOwnedKeystoneLevel(), unit)
+        return GetKeystoneInfoFromChallengeMapID(C_MythicPlus.GetOwnedKeystoneChallengeMapID(), C_MythicPlus.GetOwnedKeystoneLevel(), private:UnitFullName(unit))
     end
 
     return GetKeystoneInfoFromLibOpenRaid(unit) or GetKeystoneInfoFromKeyStore(unit)

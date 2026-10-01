@@ -42,21 +42,21 @@ end
 ---@field MultiLineInputBox DBH_CommandInputBox
 ---@field CustomGroupNameCheckBox CheckButton
 ---@field CustomGroupNameInputBox EditBox
----@field OnChanged fun(keyInfo: UnitKeystoneInfo|KeystoneInfo, runType: RunType)
+---@field OnChanged fun(keyInfo: OwnedKeystoneInfo|KeystoneInfo, runType: RunType)
 DBH_PopupInsertedFrameMixin = {}
 
 local function AreKeystoneInfosEqual(info1, info2)
     return info1.activityId == info2.activityId
     and info1.level == info2.level
-    and (not info1.unit or not info2.unit or info1.unit == info2.unit)
+    and (not info1.owner or not info2.owner or info1.owner == info2.owner)
 end
 
 ---Update the key dropdown
----@param keyInfoToSelect? KeystoneInfo|UnitKeystoneInfo
+---@param keyInfoToSelect? KeystoneInfo|OwnedKeystoneInfo
 function DBH_PopupInsertedFrameMixin:UpdateKeyDropdown(keyInfoToSelect)
     self.selectedKeyInfo = nil
 
-    ---@type KeystoneInfo[]|UnitKeystoneInfo[]
+    ---@type KeystoneInfo[]|OwnedKeystoneInfo[]
     local partyKeyData = { self.initInfo }
     local initInfoRemoved = false
     for keyInfo in private:IterPartyKeys() do
@@ -99,13 +99,11 @@ function DBH_PopupInsertedFrameMixin:UpdateKeyDropdown(keyInfoToSelect)
 
     self.KeySelectDropdown:SetupMenu(function(dropdown, rootDescription)
 		for k, keyInfo in ipairs(partyKeyData) do
-            if not keyInfo.unit or UnitExists(keyInfo.unit) then
-                local text = strupper(keyInfo.dungeonShorthand) .. " +" .. keyInfo.level;
-                if keyInfo.unit then
-                    text = text .. " (" .. UnitName(keyInfo.unit) .. ")"
-                end
-                rootDescription:CreateRadio(text, IsSelected, SetSelected, keyInfo);
+            local text = strupper(keyInfo.dungeonShorthand) .. " +" .. keyInfo.level;
+            if keyInfo.owner then
+                text = text .. " (" .. private:NameFromFullName(keyInfo.owner) .. ")"
             end
+            rootDescription:CreateRadio(text, IsSelected, SetSelected, keyInfo);
 		end
 	end);
 end
