@@ -62,7 +62,7 @@
                 <FontString inherits="ChatFontNormal"/>
             </EditBox>
 
-            <EditBox parentKey="SingleLineInputBox" inherits="InputBoxTemplate" mixin="DBH_CommandInputBoxMixin">
+            <EditBox parentKey="SingleLineInputBox" inherits="InputBoxTemplate" mixin="DBH_CommandInputBoxMixin" autoFocus="false">
                 <Size y="20"/>
                 <Anchors>
                     <Anchor point="BOTTOMLEFT" x="5"/>
@@ -92,7 +92,7 @@
                             <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-3" y="5"/>
                         </Anchors>
                         <ScrollChild>
-                            <EditBox parentKey="Text" multiLine="true" mixin="DBH_CommandInputBoxMixin" >
+                            <EditBox parentKey="Text" multiLine="true" mixin="DBH_CommandInputBoxMixin" autoFocus="false">
                                 <Size x="280" y="1"/>
                                 <Anchors>
                                     <Anchor point="TOPLEFT"/>
