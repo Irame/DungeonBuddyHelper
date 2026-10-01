@@ -1,3 +1,6 @@
+---@type string
+local addonName = ...
+
 ---@class DBH_Private
 local private = select(2, ...)
 
@@ -228,6 +231,19 @@ function DBH_PopupInsertedFrameMixin:OnLoad()
             self:InvokeOnChanged()
         end
     end)
+
+    if EllesmereUI and EllesmereUI.RegisterSkin then
+        EllesmereUI.RegisterSkin(addonName, function(S)
+            S.Dropdown(self.KeySelectDropdown)
+            S.Dropdown(self.RunTypeDropdown)
+            S.Checkbox(self.CustomGroupNameCheckBox)
+            S.EditBox(self.CustomGroupNameInputBox)
+            S.EditBox(self.SingleLineInputBox)
+            S.EditBox(self.MultiLineInputBox)
+            S.Panel(self.MultiLineInput)
+            S.ScrollBar(self.MultiLineInput.ScrollFrame.ScrollBar, true)
+        end)
+    end
 end
 
 function DBH_PopupInsertedFrameMixin:UpdateRoleSelect()

@@ -5,6 +5,7 @@
 ## IconTexture: Interface\AddOns\DungeonBuddyHelper\Images\Icon
 ## AddonCompartmentFunc: DBH_OnAddonCompartmentClick
 ## SavedVariables: DungeonBuddyHelperDB
+## OptionalDeps: EllesmereUI
 
 # External code + initialization
 embeds.xml
