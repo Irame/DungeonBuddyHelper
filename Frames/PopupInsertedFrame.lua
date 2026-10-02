@@ -240,7 +240,7 @@ function DBH_PopupInsertedFrameMixin:OnLoad()
             S.EditBox(self.CustomGroupNameInputBox, { padInput = true })
             S.EditBox(self.SingleLineInputBox, { padInput = true })
             S.EditBox(self.MultiLineInputBox, { noBorder = true })
-            S.Panel(self.MultiLineInput)
+            S.EditBox(self.MultiLineInput)
             S.ScrollBar(self.MultiLineInput.ScrollFrame.ScrollBar, true)
         end)
     end
