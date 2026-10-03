@@ -20,15 +20,15 @@ local handlers = {}
 local keys = {}
 local lifetime = 1800
 
-local function FindPartyKeyOwner(sender)
+local function IsOwnerInParty(owner)
     if not IsInGroup(LE_PARTY_CATEGORY_HOME) or IsInRaid(LE_PARTY_CATEGORY_HOME) then return end
-    local owner = private:FullName(sender)
     if not owner then return end
     for unit in private:IterPartyMembers() do
-        if unit ~= "player" and UnitExists(unit) and private:UnitFullName(unit) == owner then
-            return owner, unit
+        if unit ~= "player" and private:UnitFullName(unit) == owner then
+            return true
         end
     end
+    return false
 end
 
 ---@param unit UnitId
@@ -43,14 +43,15 @@ local function GetSharedPartyKey(unit)
     end
 end
 
----@param palyerName string
+---@param owner string
 ---@param challengeMapID integer
 ---@param level integer
 ---@param source string
-local function StorePartyKey(palyerName, challengeMapID, level, source)
-    local owner = FindPartyKeyOwner(palyerName)
-    if not owner or type(challengeMapID) ~= "number" or type(level) ~= "number"
-        or challengeMapID < 0 or level < 0 or challengeMapID % 1 ~= 0 or level % 1 ~= 0 then
+local function StorePartyKey(owner, challengeMapID, level, source)
+    if not IsOwnerInParty(owner)
+        or type(challengeMapID) ~= "number" or type(level) ~= "number"
+        or challengeMapID < 0 or level < 0 or challengeMapID % 1 ~= 0 or level % 1 ~= 0
+    then
         return
     end
 
@@ -67,7 +68,7 @@ end
 local function PrunePartyKeys()
     local removed = false
     for owner in pairs(keys) do
-        if not FindPartyKeyOwner(owner) then
+        if not IsOwnerInParty(owner) then
             keys[owner] = nil
             removed = true
         end

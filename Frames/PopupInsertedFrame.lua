@@ -104,7 +104,7 @@ function DBH_PopupInsertedFrameMixin:UpdateKeyDropdown(keyInfoToSelect)
 		for k, keyInfo in ipairs(partyKeyData) do
             local text = strupper(keyInfo.dungeonShorthand) .. " +" .. keyInfo.level;
             if keyInfo.owner then
-                text = text .. " (" .. private:NameFromFullName(keyInfo.owner) .. ")"
+                text = text .. " (" .. Ambiguate(keyInfo.owner, "short") .. ")"
             end
             rootDescription:CreateRadio(text, IsSelected, SetSelected, keyInfo);
 		end

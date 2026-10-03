@@ -3,25 +3,13 @@ local private = select(2, ...)
 
 private.Enum = {}
 
-function private:IsPublicString(value)
-    return not (issecretvalue and issecretvalue(value)) and type(value) == "string"
-end
-
-function private:FullName(name)
-    if not self:IsPublicString(name) then return end
-    if not name:find("-", 1, true) then
-        name = name .. "-" .. GetNormalizedRealmName()
-    end
-    return name:gsub("%s", "")
-end
-
 function private:UnitFullName(unit)
-    if not UnitExists(unit) then return end
-    return self:FullName(GetUnitName(unit, true))
-end
-
-function private:NameFromFullName(fullName)
-    return fullName:match("^(.-)%-.+$") or fullName
+    local name, server = UnitNameUnmodified(unit)
+    if server and server ~= "" then
+        return name .. "-" .. server
+    else
+        return name
+    end
 end
 
 function private:GetCustomGroupName()
